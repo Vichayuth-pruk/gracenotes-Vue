@@ -8,7 +8,5 @@
 </script>
 
 <style>
-#app {
-  
-}
+
 </style>

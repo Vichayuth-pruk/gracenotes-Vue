@@ -97,31 +97,77 @@
     <br /><br /><br />
 
     <div class="container">
-      <h3>ความดี ล่าสุด</h3>
-      <br />
-
-      <div v-if="socials != ''">
-        <div
-          class="card mx-auto col-sm-12 col-md-6 col-lg-5 my-5"
-          v-for="social in socials"
-          :key="social.social_id"
-        >
-          <div class="card-body">
-            <br />
-            <p style="font-size: x-large">
-              {{ social.social_detail }}
-            </p>
-            <br />
-          </div>
-          <a :href="'/social/' + social.social_id">
-            <img
-              :src="'http://localhost:5000' + social.social_img"
-              class="rounded card-img-bottom"
-            />
-          </a>
+      <div class="content">
+        <h3>เพิ่มบันทึกความดี</h3>
+        <br />
+        <label for="time">จำนวนเวลาที่ทำความดี</label>
+        <input
+          type="time"
+          v-model="time"
+          class="form-control"
+          name="time"
+          required
+        />
+        <label for="date">วันที่ทำความดี</label>
+        <input
+          type="date"
+          v-model="date"
+          class="form-control"
+          name="date"
+          required
+        />
+        <div class="form-floating mt-3">
+          <textarea
+            class="form-control"
+            v-model="detail"
+            placeholder="รายละเอียดการทำความดี"
+            name="detail"
+            style="height: 80px"
+            id="floatingTextarea"
+            required
+          ></textarea>
+          <label for="floatingTextarea">รายละเอียดการทำความดี</label>
         </div>
+        <div class="form-floating mb-3 mt-3">
+          <input
+            type="text"
+            v-model="agency"
+            class="form-control"
+            id="floatingInput"
+            name="agency"
+            placeholder="หน่วยงานที่ทำความดี"
+            maxlength="50"
+            required
+          />
+          <label for="floatingInput">หน่วยงานที่ทำความดี</label>
+        </div>
+        <div v-for="image in images" :key="image.id">
+          <p class="text-center">
+            <img
+              :src="showSelectImage(image)"
+              alt="Placeholder image"
+              class="img-fluid col-lg-3 col-md-5 col-sm-12"
+            />
+          </p>
+        </div>
+        <label for="img">รูปถ่ายความดีแนวนอน</label><br />
+        <input
+          type="file"
+          name="img"
+          accept="image/png, image/jpeg, image/webp"
+          @change="selectImages"
+          required
+        /><br />
+        <p class="text-center">
+          <input
+            type="submit"
+            class="btn btn-primary btn-lg"
+            value="บันทึก"
+            @click="validate()"
+          />
+        </p>
+        
       </div>
-      <br />
     </div>
   </div>
 </template>
@@ -132,7 +178,12 @@ export default {
   data() {
     return {
       info: null,
-      socials: "",
+      time: "",
+      date: "",
+      detail: "",
+      agency: "",
+      images: [],
+      sid: "",
     };
   },
   created() {
@@ -149,18 +200,41 @@ export default {
       .catch((error) => {
         console.log(error);
       });
-
-    axios
-      .get(`http://localhost:5000/social`)
+  },
+  methods: {
+    selectImages(event) {
+      this.images = event.target.files;
+    },
+    showSelectImage(image) {
+      // for preview only
+      return URL.createObjectURL(image);
+    },
+    addgrace() {
+      let formData = new FormData();
+      formData.append("time", this.time);
+      formData.append("date", this.date);
+      formData.append("detail", this.detail);
+      formData.append("agency", this.agency);
+      formData.append("sid", this.sid);
+      this.images.forEach((image) => {
+        formData.append("myImage", image);
+      });
+      axios
+      .post(`http://localhost:5000/grace`, formData)
       .then((response) => {
         let data = response.data;
-        this.socials = { ...data };
+        alert(data.message)
+        this.$router.push({ name: "mygrace" });
       })
       .catch((error) => {
         console.log(error);
       });
+    },
+    validate() {
+      this.sid = this.info.member_id;
+      this.addgrace()
+    },
   },
-  methods: {},
 };
 </script>
 

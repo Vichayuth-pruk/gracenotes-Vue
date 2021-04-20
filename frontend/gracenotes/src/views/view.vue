@@ -97,31 +97,53 @@
     <br /><br /><br />
 
     <div class="container">
-      <h3>ความดี ล่าสุด</h3>
-      <br />
-
-      <div v-if="socials != ''">
-        <div
-          class="card mx-auto col-sm-12 col-md-6 col-lg-5 my-5"
-          v-for="social in socials"
-          :key="social.social_id"
-        >
+      <div class="mx-auto col-lg-6 col-md-8 col-sm-12" v-if="graces != ''">
+        <div class="card">
           <div class="card-body">
-            <br />
-            <p style="font-size: x-large">
-              {{ social.social_detail }}
+            <div class="d-flex">
+              <div>
+                <span
+                  :class="{
+                    badge: true,
+                    'bg-secondary': graces.grace_check == 'รอการอนุมัติ',
+                    'bg-danger': graces.grace_check == 'ไม่ผ่าน',
+                    'bg-success': graces.grace_check == 'ผ่าน',
+                  }"
+                >
+                  <span v-if="graces.grace_check == 'รอการอนุมัติ'"
+                    >รอการรับรอง</span
+                  >
+                  <span v-else-if="graces.grace_check == 'ไม่ผ่าน'"
+                    >ไม่รับรอง</span
+                  >
+                  <span v-else>รับรองแล้ว</span>
+                </span>
+              </div>
+              <div class="ms-auto">
+                <i class="fas fa-info-circle"></i> บันทึกเมื่อ
+                {{ graces.grace_timestamp.substr(0, 10) }}
+              </div>
+            </div>
+            <span class="text-secondary">{{ graces.grace_agency }}</span>
+            <p style="font-size: x-large">{{ graces.grace_detail }}</p>
+            <p class="text-end">
+              เป็นเวลา {{ graces.grace_time.substr(0, 5) }} ชั่วโมง
+              เมื่อวันที่ {{ graces.grace_date.substr(0, 10) }} <br />
+              โดย {{ info.member_fname }} {{ info.member_lname }}
             </p>
-            <br />
           </div>
-          <a :href="'/social/' + social.social_id">
-            <img
-              :src="'http://localhost:5000' + social.social_img"
+          <a
+            :href="'http://localhost:5000' + graces.grace_img"
+            target="_blank"
+            ><img
+              :src="'http://localhost:5000' + graces.grace_img"
               class="rounded card-img-bottom"
-            />
-          </a>
+          /></a>
         </div>
+        <br />
       </div>
-      <br />
+      <br /><br />
+
     </div>
   </div>
 </template>
@@ -132,7 +154,7 @@ export default {
   data() {
     return {
       info: null,
-      socials: "",
+      graces: "",
     };
   },
   created() {
@@ -151,10 +173,13 @@ export default {
       });
 
     axios
-      .get(`http://localhost:5000/social`)
+      .get(`http://localhost:5000/grace/${this.$route.params.id}`)
       .then((response) => {
         let data = response.data;
-        this.socials = { ...data };
+        this.graces = data.filter(
+          (array) => array.member_id == this.info.member_id
+        );
+        this.graces.reverse();
       })
       .catch((error) => {
         console.log(error);

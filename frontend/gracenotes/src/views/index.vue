@@ -2,10 +2,18 @@
   <div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
       <div class="container">
-        <a class="navbar-brand" href="."> Gracenotes </a>
+        <a class="navbar-brand" href=".">
+          <img
+            src="../assets/logo.png"
+            alt=""
+            width="40"
+            height="40"
+            class="d-inline-block align-center"
+          />
+          Gracenotes </a>
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="register">ลงทะเบียนเข้าใช้งาน</a>
+            <a class="nav-link" href="/register">ลงทะเบียนเข้าใช้งาน</a>
           </li>
         </ul>
       </div>

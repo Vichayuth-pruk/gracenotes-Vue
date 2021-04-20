@@ -38,7 +38,6 @@ router.post("/register", upload.array("myImage", 5), async function (req, res, n
         const address = req.body.address;
         const pass = req.body.pass;
 
-        // bcrypt password
         const conn = await pool.getConnection();
         await conn.beginTransaction();
 

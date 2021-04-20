@@ -15,11 +15,15 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 const loginRouter = require('./routes/login');
 const registerRouter = require('./routes/register');
 const userRouter = require('./routes/user');
+const socialRouter = require('./routes/social');
+const graceRouter = require('./routes/grace');
 const pool = require("./config");
 // use routers
 app.use(loginRouter.router)
 app.use(registerRouter.router)
 app.use(userRouter.router)
+app.use(socialRouter.router)
+app.use(graceRouter.router)
 
 app.listen(5000, () => {
   console.log(`database running at http://localhost:5000`)
