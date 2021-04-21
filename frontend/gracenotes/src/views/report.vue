@@ -243,7 +243,7 @@ export default {
           console.log(error);
         });
     },
-    showReport() {
+    showReport () {
       axios
         .get(`http://localhost:5000/report`)
         .then((response) => {
@@ -251,6 +251,7 @@ export default {
           this.reports = data.filter(
             (array) => array.member_id == this.info.member_id
           );
+          // problem
           this.reports.forEach((item) => {
             let amount = this.countReply(item.report_id); // <-- Call Function please wait for return
             console.log(amount+"สอง") 
