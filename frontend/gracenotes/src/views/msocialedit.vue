@@ -30,7 +30,7 @@
         >
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" href="/main"
+              <a class="nav-link" href="/main"
                 ><i class="fas fa-home"></i> หน้าแรก</a
               >
             </li>
@@ -47,7 +47,7 @@
             </li>
 
             <li class="nav-item" v-if="info.member_level == 'teacher'">
-              <a class="nav-link text-danger" href="/admin"
+              <a class="nav-link text-danger active" href="/admin"
                 ><i class="fas fa-asterisk"></i> Admin Panel</a
               >
             </li>
@@ -99,30 +99,69 @@
     <br /><br /><br />
 
     <div class="container">
-      <h3>ความดี ล่าสุด</h3>
+      <a href="/admin"
+        ><button class="btn btn-primary m-1">ตรวจบันทึกความดี</button></a
+      >
+      <a href="/msocial"
+        ><button class="btn btn-success m-1">จัดการโพสต์</button></a
+      >
+      <a href="/maccount"
+        ><button class="btn btn-info m-1">จัดการบัญชีนักเรียน</button></a
+      >
+      <a href="/mreport"
+        ><button class="btn btn-warning m-1">จัดการรายงานปัญหา</button></a
+      >
+      <br /><br />
 
-      <div v-if="socials != ''">
-        <div
-          class="card mx-auto col-sm-12 col-md-6 col-lg-5 my-5"
-          v-for="social in socials"
-          :key="social.social_id"
-        >
-          <div class="card-body">
-            <br />
-            <p style="font-size: x-large">
-              {{ social.social_detail }}
-            </p>
-            <br />
-          </div>
-          <a :href="'/social/' + social.social_id">
-            <img
-              :src="'http://localhost:5000' + social.social_img"
-              class="rounded card-img-bottom"
-            />
-          </a>
+      <h3 class="text-center my-3">
+        หมายเลขโพสต์
+        <span class="text-primary">
+          {{ socials.social_id }}
+        </span>
+      </h3>
+      <p class="text-center col-lg-6 col-md-12 col-sm-12 mx-auto">
+        <a :href="'http://localhost:5000' + socials.social_img" target="_blank">
+          <img
+            :src="'http://localhost:5000' + socials.social_img"
+            alt=""
+            class="img-fluid rounded"
+          />
+        </a>
+      </p>
+      <div class="content col-lg-7 col-md-12 col-sm-12 mx-auto" v-if="socials != ''">
+        <div class="form-floating">
+          <textarea
+            v-model="socials.social_detail"
+            required
+            name="detail"
+            class="form-control"
+            placeholder="เขียนโพสต์"
+            id="floatingTextarea2"
+            style="height: 100px"
+          ></textarea>
+          <label for="floatingTextarea2">เขียนโพสต์</label>
         </div>
+        <p class="text-end my-1">
+          เผยแพร่เมื่อ {{ socials.social_timestamp.substr(0, 10) }} เวลา
+          {{ socials.social_timestamp.substr(11, 5) }}
+        </p>
+        <p class="text-center">
+          <input
+            @click="validate()"
+            type="submit"
+            class="btn btn-info"
+            value="อัปเดต"
+          />
+        </p>
+
+        <p class="text-end">
+          <button @click="delSocial()" class="btn btn-outline-danger">
+            ลบ
+          </button>
+        </p>
       </div>
-      <br />
+
+      <br /><br />
     </div>
   </div>
 </template>
@@ -134,35 +173,76 @@ export default {
     return {
       info: null,
       socials: "",
+      detail: "",
+      sid: "",
     };
   },
   created() {
     this.info = JSON.parse(localStorage.getItem("formLogin"));
-    if (this.info == null) {
+    if (this.info == null || this.info.s_level != "teacher") {
       this.$router.push({ name: "index" });
     }
     axios
       .get(`http://localhost:5000/user/${this.info.s_id}`)
       .then((response) => {
         let data = response.data;
-        this.info = { ...data };
+        this.info = data;
       })
       .catch((error) => {
         console.log(error);
       });
-
-    axios
-      .get(`http://localhost:5000/social`)
-      .then((response) => {
-        let data = response.data;
-        this.socials = data;
-        this.socials.reverse(); // order by desc
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.showSocial();
   },
-  methods: {},
+  methods: {
+    showSocial() {
+      axios
+        .get(`http://localhost:5000/social/${this.$route.params.id}`)
+        .then((response) => {
+          let data = response.data;
+          this.socials = data[0];
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    updateSocial() {
+      axios
+        .put(`http://localhost:5000/social/${this.socials.social_id}`, {
+          detail: this.detail,
+          sid: this.socials.social_id,
+        })
+        .then((response) => {
+          let data = response.data;
+          this.showSocial()
+          alert(data.message);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    delSocial() {
+      let con = confirm("คุณแน่ใจที่จะลบโพสต์นี้ ?");
+      if (con) {
+        axios
+          .delete(`http://localhost:5000/social/${this.socials.social_id}`)
+          .then((response) => {
+            let data = response.data;
+            alert(data.message);
+            this.$router.push({ name: "msocial" });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+          return
+      }
+    },
+    validate() {
+      this.detail = this.socials.social_detail;
+      this.sid = this.socials.social_id;
+      this.updateSocial();
+    },
+  },
 };
 </script>
 

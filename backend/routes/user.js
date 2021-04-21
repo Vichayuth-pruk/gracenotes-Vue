@@ -21,6 +21,21 @@ router.get("/user/:id", async function(req, res, next){
     }
 })
 
+router.get("/user", async function(req, res, next){
+    const conn = await pool.getConnection()
+    await conn.beginTransaction();
+    try {
+        let [result, _] = await conn.query("SELECT * FROM members ORDER BY member_id ASC;")
+        res.json(result)
+        await conn.commit();
+    } catch (err) {
+        await conn.rollback();
+        return res.status(400).json(err);
+    } finally {
+        conn.release();
+    }
+})
+
 router.put("/user", async function(req, res, next){
     const profile = req.body.form;
     const user = req.body.form.member_user;

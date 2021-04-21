@@ -11,6 +11,12 @@ import pathAddgrace from '../views/addgrace.vue'
 import pathMygrace from '../views/mygrace.vue'
 import pathView from '../views/view.vue'
 import pathReport from '../views/report.vue'
+import pathViewreport from '../views/viewreport.vue'
+import pathMview from '../views/mview.vue'
+import pathAddsocial from '../views/addsocial.vue'
+import pathMsocialedit from '../views/msocialedit.vue'
+import pathMsocial from '../views/msocial.vue'
+import pathSocial from '../views/social.vue'
 
 Vue.use(VueRouter)
 const routes = [
@@ -68,6 +74,36 @@ const routes = [
     path: '/report',
     name: 'report',
     component: pathReport // set Report as path '/'
+  },
+  {
+    path: '/viewreport/:id',
+    name: 'viewreport',
+    component: pathViewreport // set Viewreport as path '/'
+  },
+  {
+    path: '/mview/:id',
+    name: 'mview',
+    component: pathMview // set Mview as path '/'
+  },
+  {
+    path: '/addsocial/:id',
+    name: 'addsocial',
+    component: pathAddsocial // set Addsocial as path '/'
+  },
+  {
+    path: '/msocialedit/:id',
+    name: 'msocialedit',
+    component: pathMsocialedit // set Msocialedit as path '/'
+  },
+  {
+    path: '/msocial',
+    name: 'msocial',
+    component: pathMsocial // set Msocial as path '/'
+  },
+  {
+    path: '/social/:id',
+    name: 'social',
+    component: pathSocial // set Social as path '/'
   },
 ]
 const router = new VueRouter({

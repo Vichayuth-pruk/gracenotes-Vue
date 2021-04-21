@@ -30,7 +30,7 @@
         >
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" href="/main"
+              <a class="nav-link" href="/main"
                 ><i class="fas fa-home"></i> หน้าแรก</a
               >
             </li>
@@ -99,31 +99,37 @@
     <br /><br /><br />
 
     <div class="container">
-      <h3>ความดี ล่าสุด</h3>
+            <div class="col-lg-9 col-md-12 col-sm-12 mx-auto" v-for="report in reports" :key="report.report_id">
+                <div class="content">
+                    <h4>
+                        {{report.report_topic}}
+                    </h4>
+                    <p>
+                        {{report.report_detail}}
+                    </p>
+                    <p class="text-end">ส่งเมื่อ
+                        {{report.report_timestamp.substr(0, 10)}} {{report.report_timestamp.substr(11, 5)}}
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-12 col-sm-12 my-3">
+                <h3>กล่องรายงานตอบกลับ</h3>
+            </div>
 
-      <div v-if="socials != ''">
-        <div
-          class="card mx-auto col-sm-12 col-md-6 col-lg-5 my-5"
-          v-for="social in socials"
-          :key="social.social_id"
-        >
-          <div class="card-body">
-            <br />
-            <p style="font-size: x-large">
-              {{ social.social_detail }}
-            </p>
-            <br />
-          </div>
-          <a :href="'/social/' + social.social_id">
-            <img
-              :src="'http://localhost:5000' + social.social_img"
-              class="rounded card-img-bottom"
-            />
-          </a>
-        </div>
-      </div>
-      <br />
+            <div class="col-lg-9 col-md-12 col-sm-12 mx-auto my-3" v-for="reply in replys" :key="'reply' + reply.reply_id">
+                <div class="content">
+                    <h5>
+                        {{reply.reply_detail}}
+                    </h5>
+                    <p>ตอบกลับเมื่อ
+                        {{reply.reply_timestamp.substr(0, 10)}} {{reply.reply_timestamp.substr(11, 5)}}
+                    </p>
+                </div>
+            </div>
+            
+            <br><br>
     </div>
+
   </div>
 </template>
 
@@ -133,7 +139,8 @@ export default {
   data() {
     return {
       info: null,
-      socials: "",
+      reports: "",
+      replys: "",
     };
   },
   created() {
@@ -150,19 +157,32 @@ export default {
       .catch((error) => {
         console.log(error);
       });
-
-    axios
-      .get(`http://localhost:5000/social`)
-      .then((response) => {
-        let data = response.data;
-        this.socials = data;
-        this.socials.reverse(); // order by desc
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.showReport();
   },
-  methods: {},
+  methods: {
+    showReport() {
+      axios
+        .get(`http://localhost:5000/report`)
+        .then((response) => {
+          let rp = response.data.rp;
+          let rpl = response.data.rpl;
+          this.reports = rp.filter(
+            (array) => array.report_id == this.$route.params.id
+          );
+          this.replys = rpl.filter(
+              (array) => array.report_id == this.$route.params.id
+          )
+          this.replys.reverse(); // order by desc
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    validate() {
+      this.sid = this.info.member_id;
+      this.report();
+    },
+  },
 };
 </script>
 

@@ -19,6 +19,8 @@ const socialRouter = require('./routes/social');
 const graceRouter = require('./routes/grace');
 const reportRouter = require('./routes/report');
 const replyRouter = require('./routes/reply');
+const commentRouter = require('./routes/comment');
+const statusRouter = require('./routes/status');
 const pool = require("./config");
 // use routers
 app.use(loginRouter.router)
@@ -28,6 +30,8 @@ app.use(socialRouter.router)
 app.use(graceRouter.router)
 app.use(reportRouter.router)
 app.use(replyRouter.router)
+app.use(commentRouter.router)
+app.use(statusRouter.router)
 
 app.listen(5000, () => {
   console.log(`database running at http://localhost:5000`)

@@ -12,8 +12,8 @@ router.post("/report", async function (req, res, next) {
     const conn = await pool.getConnection();
     await conn.beginTransaction();
     try {
-        await conn.query("INSERT INTO report (report_topic, report_detail, member_id)", [head, body, sid]);
-        res.status(204)
+        await conn.query("INSERT INTO report (report_topic, report_detail, member_id) VALUES (?, ?, ?)", [head, body, sid]);
+        res.json({message: "success"})
         await conn.commit();
     } catch (err) {
         await conn.rollback();
@@ -28,8 +28,9 @@ router.get("/report", async function (req, res, next) {
     const conn = await pool.getConnection();
     await conn.beginTransaction();
     try {
-        let [rows, _] = await conn.query("SELECT * FROM report ORDER BY report_id ASC", );
-        res.json(rows)
+        let [rows, _] = await conn.query("SELECT * FROM report ORDER BY report_id ASC;");
+        let [rpl, __] = await conn.query("SELECT * FROM report_feedback ORDER BY reply_id ASC;");
+        res.json({rp: rows, rpl: rpl})
         await conn.commit();
     } catch (err) {
         await conn.rollback();

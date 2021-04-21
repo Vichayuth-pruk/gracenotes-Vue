@@ -30,7 +30,7 @@
         >
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" href="/main"
+              <a class="nav-link" href="/main"
                 ><i class="fas fa-home"></i> หน้าแรก</a
               >
             </li>
@@ -47,7 +47,7 @@
             </li>
 
             <li class="nav-item" v-if="info.member_level == 'teacher'">
-              <a class="nav-link text-danger" href="/admin"
+              <a class="nav-link text-danger active" href="/admin"
                 ><i class="fas fa-asterisk"></i> Admin Panel</a
               >
             </li>
@@ -99,30 +99,75 @@
     <br /><br /><br />
 
     <div class="container">
-      <h3>ความดี ล่าสุด</h3>
+      <a href="/admin"
+        ><button class="btn btn-primary m-1">ตรวจบันทึกความดี</button></a
+      >
+      <a href="/msocial"
+        ><button class="btn btn-success m-1">จัดการโพสต์</button></a
+      >
+      <a href="/maccount"
+        ><button class="btn btn-info m-1">จัดการบัญชีนักเรียน</button></a
+      >
+      <a href="/mreport"
+        ><button class="btn btn-warning m-1">จัดการรายงานปัญหา</button></a
+      >
+      <br /><br />
 
-      <div v-if="socials != ''">
-        <div
-          class="card mx-auto col-sm-12 col-md-6 col-lg-5 my-5"
-          v-for="social in socials"
-          :key="social.social_id"
-        >
-          <div class="card-body">
-            <br />
-            <p style="font-size: x-large">
-              {{ social.social_detail }}
-            </p>
-            <br />
-          </div>
-          <a :href="'/social/' + social.social_id">
+      <div
+        class="content col-lg-7 col-md-12 col-sm-12 mx-auto"
+        v-if="graces != ''"
+      >
+        <p class="text-center">
+          <a :href="'http://localhost:5000' + graces.grace_img" target="_blank">
             <img
-              :src="'http://localhost:5000' + social.social_img"
-              class="rounded card-img-bottom"
+              :src="'http://localhost:5000' + graces.grace_img"
+              alt=""
+              class="img-fluid rounded"
             />
           </a>
+        </p>
+        <div class="text-secondary">
+          {{ graces.grace_agency }}
         </div>
+        <p>
+          {{ graces.grace_detail }}
+        </p>
+        <p class="text-end">
+          เป็นเวลา {{ graces.grace_time.substr(0, 5) }} ชั่วโมง เมื่อวันที่
+          {{ graces.grace_date.substr(0, 10) }}<br />
+          โดย
+          <a
+            :href="'/mprofile/' + graces.member_id"
+            style="text-decoration: none"
+          >
+            {{ graces.member_fname }} {{ graces.member_lname }}
+          </a>
+        </p>
+
+        <div class="form-floating">
+          <textarea
+            v-model="details"
+            required
+            name="detail"
+            class="form-control"
+            placeholder="เขียนโพสต์"
+            id="floatingTextarea2"
+            style="height: 100px"
+          ></textarea>
+          <label for="floatingTextarea2">เขียนโพสต์</label>
+        </div>
+        <br />
+        <p class="text-center">
+          <input
+            type="submit"
+            class="btn btn-primary"
+            @click="validate()"
+            value="เผยแพร่"
+          />
+        </p>
       </div>
-      <br />
+
+      <br /><br />
     </div>
   </div>
 </template>
@@ -133,36 +178,67 @@ export default {
   data() {
     return {
       info: null,
-      socials: "",
+      graces: "",
+      details: "",
+      img: "",
+      uid: "",
     };
   },
   created() {
     this.info = JSON.parse(localStorage.getItem("formLogin"));
-    if (this.info == null) {
+    if (this.info == null || this.info.s_level != "teacher") {
       this.$router.push({ name: "index" });
     }
     axios
       .get(`http://localhost:5000/user/${this.info.s_id}`)
       .then((response) => {
         let data = response.data;
-        this.info = { ...data };
+        this.info = data;
       })
       .catch((error) => {
         console.log(error);
       });
-
-    axios
-      .get(`http://localhost:5000/social`)
-      .then((response) => {
-        let data = response.data;
-        this.socials = data;
-        this.socials.reverse(); // order by desc
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.showGrace();
   },
-  methods: {},
+  methods: {
+    showGrace() {
+      axios
+        .get(`http://localhost:5000/grace/${this.$route.params.id}`)
+        .then((response) => {
+          let data = response.data;
+          this.graces = data[0];
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    Social() {
+      axios
+        .post(`http://localhost:5000/social`, {
+            img: this.img,
+            detail: this.details,
+            uid: this.uid
+        })
+        .then((response) => {
+          let data = response.data;
+          alert(data.message)
+          this.$router.push({ path: `/social/${data.id}` });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    validate() {
+      this.img = this.graces.grace_img;
+      this.uid = this.info.member_id;
+      let con = confirm("ยืนยันเผยแพร่ ?")
+      if (con) {
+          this.Social();
+      }else{
+          return
+      }
+    },
+  },
 };
 </script>
 

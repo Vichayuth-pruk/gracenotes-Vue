@@ -25,7 +25,28 @@ router.get("/grace", async function (req, res, next) {
     const conn = await pool.getConnection()
     await conn.beginTransaction();
     try {
-        let result = await conn.query("SELECT * FROM grace ORDER BY grace_id ASC;")
+        let result = await conn.query("SELECT * FROM grace JOIN members USING (member_id) ORDER BY grace_id ASC;")
+        res.json(result[0])
+        await conn.commit();
+    } catch (err) {
+        await conn.rollback();
+        return res.status(400).json(err);
+    } finally {
+        conn.release();
+    }
+})
+
+// coding here !!
+router.get("/grace/search/:sr", async function (req, res, next) {
+    const key = '%' + req.params.sr + '%'
+    const conn = await pool.getConnection()
+    await conn.beginTransaction();
+    try {
+        let result = await conn.query(`SELECT * FROM grace JOIN members USING (member_id)
+        WHERE grace_id LIKE ?
+        OR members.member_fname LIKE ?
+        OR members.member_lname LIKE ?
+        ORDER BY grace_id ASC;`, [key, key, key])
         res.json(result[0])
         await conn.commit();
     } catch (err) {
@@ -40,8 +61,38 @@ router.get("/grace/:id", async function (req, res, next) {
     const conn = await pool.getConnection()
     await conn.beginTransaction();
     try {
-        let result = await conn.query("SELECT * FROM grace WHERE grace_id = ?;", [req.params.id])
+        let result = await conn.query("SELECT * FROM grace JOIN members USING (member_id) WHERE grace_id = ?;", [req.params.id])
         res.json(result[0])
+        await conn.commit();
+    } catch (err) {
+        await conn.rollback();
+        return res.status(400).json(err);
+    } finally {
+        conn.release();
+    }
+})
+
+router.put("/grace/:id", async function (req, res, next) { 
+    const conn = await pool.getConnection()
+    await conn.beginTransaction();
+    try {
+        await conn.query("UPDATE grace SET grace_check=? WHERE grace_id=?;", [req.body.value, req.params.id])
+        res.json({ message: 'อัปเดตสถานะการตรวจเป็น ' + req.body.value + ' แล้ว' })
+        await conn.commit();
+    } catch (err) {
+        await conn.rollback();
+        return res.status(400).json(err);
+    } finally {
+        conn.release();
+    }
+})
+
+router.delete("/grace/:id", async function (req, res, next) { 
+    const conn = await pool.getConnection()
+    await conn.beginTransaction();
+    try {
+        await conn.query("DELETE FROM grace WHERE grace_id=?;", [req.params.id])
+        res.json({ message: 'ลบบันทึกนี้แล้ว' })
         await conn.commit();
     } catch (err) {
         await conn.rollback();

@@ -41,13 +41,13 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/report"
+              <a class="nav-link" href="/report"
                 ><i class="fas fa-bug"></i> รายงานปัญหา</a
               >
             </li>
 
             <li class="nav-item" v-if="info.member_level == 'teacher'">
-              <a class="nav-link text-danger" href="/admin"
+              <a class="nav-link text-danger active" href="/admin"
                 ><i class="fas fa-asterisk"></i> Admin Panel</a
               >
             </li>
@@ -99,90 +99,89 @@
     <br /><br /><br />
 
     <div class="container">
-      <h3>รายงานปัญหา</h3>
-      <div class="row">
-        <div class="col-lg-7 col-md-12 col-sm-12 mx-auto">
-          <label for="head">หัวข้อ</label>
-          <input
-            type="text"
-            v-model="head"
-            class="form-control"
-            placeholder="หัวข้อ"
-            name="head"
-            maxlength="100"
-            required
+      <a href="/admin"
+        ><button class="btn btn-primary m-1">ตรวจบันทึกความดี</button></a
+      >
+      <a href="/msocial"
+        ><button class="btn btn-success m-1">จัดการโพสต์</button></a
+      >
+      <a href="/maccount"
+        ><button class="btn btn-info m-1">จัดการบัญชีนักเรียน</button></a
+      >
+      <a href="/mreport"
+        ><button class="btn btn-warning m-1">จัดการรายงานปัญหา</button></a
+      >
+      <br /><br />
+      <h3 class="text-center">
+        หมายเลขบันทึก
+        <span class="text-primary">
+          {{ graces.grace_id }}
+        </span>
+      </h3>
+      <br />
+      <div class="col-lg-5 col-md-12 col-sm-12 mx-auto">
+        <a :href="'http://localhost:5000' + graces.grace_img" target="_blank">
+          <img
+            :src="'http://localhost:5000' + graces.grace_img"
+            alt=""
+            class="img-fluid rounded"
           />
-          <label for="body">รายละเอียด</label>
-          <textarea
-            name="body"
-            v-model="body"
-            class="form-control"
-            placeholder="รายะเอียด"
-            cols="30"
-            rows="2"
-            required
-          ></textarea>
-          <br />
-          <p class="text-center">
-            <input
-              type="submit"
-              class="btn btn-warning"
-              value="ส่งรายงาน"
-              @click="validate()"
-            />
-          </p>
-        </div>
+        </a>
       </div>
       <br />
+      <div
+        class="content mx-auto col-lg-8 col-md-12 col-sm-12"
+        v-if="graces != ''"
+      >
+        <div class="text-secondary">
+          {{ graces.grace_agency }}
+        </div>
+        <p>
+          {{ graces.grace_detail }}
+        </p>
+        <p class="text-end">
+          เป็นเวลา {{ graces.grace_time.substr(0, 5) }} ชั่วโมง เมื่อวันที่
+          {{ graces.grace_date.substr(0, 10) }}<br />
+          โดย
+          <a
+            :href="'/mprofile/' + graces.member_id"
+            style="text-decoration: none"
+          >
+            {{ graces.member_fname }} {{ graces.member_lname }}
+          </a>
+        </p>
+        <div class="text-center text-secondary">
+          บันทึกเมื่อ {{ graces.grace_timestamp.substr(0, 10) }} เวลา
+          {{ graces.grace_timestamp.substr(11, 8) }} นาฬิกา
+        </div>
+        <br />
 
-      <h3>กล่องรายงานปัญหา</h3>
-      <div class="content">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <td class="col-lg-10">
-                <p class="text-center">หัวข้อ</p>
-              </td>
-              <td class="col-lg-2">
-                <p class="text-center">สถานะ</p>
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in reports" :key="item.report_id">
-              <td>
-                <div class="d-flex">
-                  <a
-                    style="text-decoration: none; color: black"
-                    :href="'/viewreport/' + item.report_id"
-                  >
-                    {{ item.report_topic }}
-                  </a>
-                  <div class="ms-auto">
-                    <i class="fas fa-info-circle"></i> ส่งเมื่อ
-                    {{ item.report_timestamp.substr(0, 10) }}
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="d-flex">
-                  <div class="mx-auto">
-                    <span
-                      :class="{
-                        badge: true,
-                        'bg-secondary': item.totalReply == 0,
-                        'bg-info': item.totalReply != 0,
-                      }"
-                    >
-                      <span v-if="item.totalReply == 0">ยังไม่มีการตอบรับ</span>
-                      <span v-else>ตอบรับแล้ว </span>
-                    </span>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <select
+          v-model="graces.grace_check"
+          name="status"
+          id=""
+          class="form-control"
+          required
+        >
+          <option value="ผ่าน">ผ่าน</option>
+          <option value="ไม่ผ่าน">ไม่ผ่าน</option>
+          <option value="รอการอนุมัติ">รอการอนุมัติ</option>
+        </select>
+        <p class="text-center my-3">
+          <input
+            type="submit"
+            class="btn btn-info"
+            value="อัปเดต"
+            @click="validate()"
+          />
+        </p>
+
+        <p class="text-end">
+          <button class="btn btn-outline-danger mx-1" @click="delGrace()">
+            ลบ
+          </button>
+          <a :href="'/addsocial/' + graces.grace_id"> <button class="btn btn-success mx-1">เผยแพร่</button> </a>
+        </p>
       </div>
       <br /><br />
     </div>
@@ -195,74 +194,70 @@ export default {
   data() {
     return {
       info: null,
-      reports: "",
-      replys: "",
-      head: "",
-      body: "",
-      sid: "",
+      graces: "",
     };
   },
   created() {
     this.info = JSON.parse(localStorage.getItem("formLogin"));
-    if (this.info == null) {
+    if (this.info == null || this.info.s_level != "teacher") {
       this.$router.push({ name: "index" });
     }
     axios
       .get(`http://localhost:5000/user/${this.info.s_id}`)
       .then((response) => {
         let data = response.data;
-        this.info = { ...data };
+        this.info = data;
       })
       .catch((error) => {
         console.log(error);
       });
-    this.showReport();
+    this.showGrace();
   },
   methods: {
-    report() {
+    showGrace() {
       axios
-        .post(`http://localhost:5000/report`, {
-          head: this.head,
-          body: this.body,
-          sid: this.sid,
-        })
-        .then(() => {
-          this.showReport()
+        .get(`http://localhost:5000/grace/${this.$route.params.id}`)
+        .then((response) => {
+          let data = response.data;
+          this.graces = data[0];
         })
         .catch((error) => {
           console.log(error);
         });
     },
-    showReport() {
+    updateCheck() {
       axios
-        .get(`http://localhost:5000/report`)
+        .put(`http://localhost:5000/grace/${this.$route.params.id}`, {
+          value: this.graces.grace_check,
+        })
         .then((response) => {
-          let rp = response.data.rp;
-          let rpl = response.data.rpl;
-          this.reports = rp.filter(
-            (array) => array.member_id == this.info.member_id
-          );
-          this.reports.reverse(); // order by desc
-          for (let i = 0; i < this.reports.length; i++) {
-            var cout = 0;
-            for (let j = 0; j < rpl.length; j++) {
-              if (this.reports[i].report_id == rpl[j].report_id) {
-                cout++;
-              }
-            }
-            this.reports[i] = {
-              ...this.reports[i],
-              totalReply: cout,
-            };
-          }
+          let data = response.data;
+          this.showGrace()
+          alert(data.message);
         })
         .catch((error) => {
           console.log(error);
         });
+    },
+    delGrace() {
+      let con = confirm(`ลบบันทึกความดี หมายเลข ${this.$route.params.id} ?`);
+      if (con) {
+        axios
+          .delete(`http://localhost:5000/grace/${this.$route.params.id}`)
+          .then((response) => {
+            let data = response.data;
+            alert(data.message);
+            this.$router.push({ name: "admin" });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        return;
+      }
     },
     validate() {
-      this.sid = this.info.member_id;
-      this.report();
+      this.updateCheck();
     },
   },
 };
