@@ -10,6 +10,7 @@ import pathGrace from '../views/grace.vue'
 import pathAddgrace from '../views/addgrace.vue'
 import pathMygrace from '../views/mygrace.vue'
 import pathView from '../views/view.vue'
+import pathReport from '../views/report.vue'
 
 Vue.use(VueRouter)
 const routes = [
@@ -62,6 +63,11 @@ const routes = [
     path: '/view/:id',
     name: 'view',
     component: pathView // set View as path '/'
+  },
+  {
+    path: '/report',
+    name: 'report',
+    component: pathReport // set Report as path '/'
   },
 ]
 const router = new VueRouter({

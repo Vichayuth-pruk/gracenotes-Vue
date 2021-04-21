@@ -30,12 +30,12 @@
         >
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="/main"
+              <a class="nav-link active" href="/main"
                 ><i class="fas fa-home"></i> หน้าแรก</a
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/grace"
+              <a class="nav-link" href="/grace"
                 ><i class="fas fa-address-book"></i>
                 บันทึกความดีกิจกรรมเพื่อสังคมและสาธารณะประโยชน์</a
               >
@@ -154,7 +154,8 @@ export default {
       .get(`http://localhost:5000/social`)
       .then((response) => {
         let data = response.data;
-        this.socials = { ...data };
+        this.socials = data;
+        this.socials.reverse(); // order by desc
       })
       .catch((error) => {
         console.log(error);

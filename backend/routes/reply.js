@@ -1,17 +1,14 @@
 const express = require("express");
-const path = require("path")
 const pool = require("../config");
 
 router = express.Router();
 
-// coding here !!
-router.get("/social", async function(req, res, next){
-
-    const conn = await pool.getConnection()
+router.get("/reply", async function (req, res, next) {
+    const conn = await pool.getConnection();
     await conn.beginTransaction();
     try {
-        let [result, _] = await conn.query("SELECT * FROM social ORDER BY social_id ASC;")
-        res.json(result)
+        let [rows, _] = await conn.query("SELECT * FROM report_feedback ORDER BY reply_id ASC;");
+        res.json(rows);
         await conn.commit();
     } catch (err) {
         await conn.rollback();
@@ -20,5 +17,7 @@ router.get("/social", async function(req, res, next){
         conn.release();
     }
 })
+
+
 
 exports.router = router;

@@ -17,6 +17,8 @@ const registerRouter = require('./routes/register');
 const userRouter = require('./routes/user');
 const socialRouter = require('./routes/social');
 const graceRouter = require('./routes/grace');
+const reportRouter = require('./routes/report');
+const replyRouter = require('./routes/reply');
 const pool = require("./config");
 // use routers
 app.use(loginRouter.router)
@@ -24,6 +26,8 @@ app.use(registerRouter.router)
 app.use(userRouter.router)
 app.use(socialRouter.router)
 app.use(graceRouter.router)
+app.use(reportRouter.router)
+app.use(replyRouter.router)
 
 app.listen(5000, () => {
   console.log(`database running at http://localhost:5000`)

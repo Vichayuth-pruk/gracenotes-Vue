@@ -41,7 +41,7 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/report"
+              <a class="nav-link active" href="/report"
                 ><i class="fas fa-bug"></i> รายงานปัญหา</a
               >
             </li>
@@ -72,7 +72,9 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li>
-                  <a class="dropdown-item" href="/mygrace">บันทึกความดีของฉัน</a>
+                  <a class="dropdown-item" href="/mygrace"
+                    >บันทึกความดีของฉัน</a
+                  >
                 </li>
                 <li><a class="dropdown-item" href="/profile">การตั้งค่า</a></li>
                 <li>
@@ -97,77 +99,89 @@
     <br /><br /><br />
 
     <div class="container">
-      <div class="content">
-        <h3>เพิ่มบันทึกความดี</h3>
-        <br />
-        <label for="time">จำนวนเวลาที่ทำความดี</label>
-        <input
-          type="time"
-          v-model="time"
-          class="form-control"
-          name="time"
-          required
-        />
-        <label for="date">วันที่ทำความดี</label>
-        <input
-          type="date"
-          v-model="date"
-          class="form-control"
-          name="date"
-          required
-        />
-        <div class="form-floating mt-3">
-          <textarea
-            class="form-control"
-            v-model="detail"
-            placeholder="รายละเอียดการทำความดี"
-            name="detail"
-            style="height: 80px"
-            id="floatingTextarea"
-            required
-          ></textarea>
-          <label for="floatingTextarea">รายละเอียดการทำความดี</label>
-        </div>
-        <div class="form-floating mb-3 mt-3">
+      <h3>รายงานปัญหา</h3>
+      <div class="row">
+        <div class="col-lg-7 col-md-12 col-sm-12 mx-auto">
+          <label for="head">หัวข้อ</label>
           <input
             type="text"
-            v-model="agency"
+            v-model="head"
             class="form-control"
-            id="floatingInput"
-            name="agency"
-            placeholder="หน่วยงานที่ทำความดี"
-            maxlength="50"
+            placeholder="หัวข้อ"
+            name="head"
+            maxlength="100"
             required
           />
-          <label for="floatingInput">หน่วยงานที่ทำความดี</label>
-        </div>
-        <div v-for="image in images" :key="image.id">
+          <label for="body">รายละเอียด</label>
+          <textarea
+            name="body"
+            v-model="body"
+            class="form-control"
+            placeholder="รายะเอียด"
+            cols="30"
+            rows="2"
+            required
+          ></textarea>
+          <br />
           <p class="text-center">
-            <img
-              :src="showSelectImage(image)"
-              alt="Placeholder image"
-              class="img-fluid col-lg-3 col-md-5 col-sm-12"
+            <input
+              type="submit"
+              class="btn btn-warning"
+              value="ส่งรายงาน"
+              @click="validate()"
             />
           </p>
         </div>
-        <label for="img">รูปถ่ายความดีแนวนอน</label><br />
-        <input
-          type="file"
-          name="img"
-          accept="image/png, image/jpeg, image/webp"
-          @change="selectImages"
-          required
-        /><br />
-        <p class="text-center">
-          <input
-            type="submit"
-            class="btn btn-primary btn-lg"
-            value="บันทึก"
-            @click="validate()"
-          />
-        </p>
-        
       </div>
+      <br />
+
+      <h3>กล่องรายงานปัญหา</h3>
+      <div class="content">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <td class="col-lg-10">
+                <p class="text-center">หัวข้อ</p>
+              </td>
+              <td class="col-lg-2">
+                <p class="text-center">สถานะ</p>
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in reports" :key="item.report_id">
+              <td>
+                <div class="d-flex">
+                  <a style="text-decoration: none; color: black" href="">
+                    {{ item.report_topic }} {{ item.totalReply }}
+                  </a>
+                  <div class="ms-auto">
+                    <i class="fas fa-info-circle"></i> ส่งเมื่อ
+                    {{ item.report_timestamp.substr(0, 10) }}
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex">
+                  <div class="mx-auto">
+                    <span
+                      :class="{
+                        badge: true,
+                        'bg-secondary': item.totalReply == 0,
+                        'bg-info': item.totalReply != 0,
+                      }"
+                    >
+                      <span v-if="item.totalReply == 0">ยังไม่มีการตอบรับ</span>
+                      <span v-else>ตอบรับแล้ว </span>
+                    </span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <br /><br />
     </div>
   </div>
 </template>
@@ -178,11 +192,10 @@ export default {
   data() {
     return {
       info: null,
-      time: "",
-      date: "",
-      detail: "",
-      agency: "",
-      images: [],
+      reports: "",
+      replys: "",
+      head: "",
+      body: "",
       sid: "",
     };
   },
@@ -200,39 +213,58 @@ export default {
       .catch((error) => {
         console.log(error);
       });
+    this.showReport();
   },
   methods: {
-    selectImages(event) {
-      this.images = event.target.files;
-    },
-    showSelectImage(image) {
-      // for preview only
-      return URL.createObjectURL(image);
-    },
-    addgrace() {
-      let formData = new FormData();
-      formData.append("time", this.time);
-      formData.append("date", this.date);
-      formData.append("detail", this.detail);
-      formData.append("agency", this.agency);
+    report() {
+      let formData = new formData();
+      formData.append("head", this.head);
+      formData.append("body", this.body);
       formData.append("sid", this.sid);
-      this.images.forEach((image) => {
-        formData.append("myImage", image);
-      });
       axios
-      .post(`http://localhost:5000/grace`, formData)
-      .then((response) => {
-        let data = response.data;
-        alert(data.message)
-        this.$router.push({ name: "mygrace" });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+        .post(`http://localhost:5000/report`, formData)
+        .then(() => {
+          this.showReport();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    countReply(tId) {
+      axios
+        .get(`http://localhost:5000/reply`)
+        .then((response) => {
+          let data = response.data;
+          let amount = data.filter((array) => array.report_id == tId).length;
+          console.log("แรก")
+          return amount
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    showReport() {
+      axios
+        .get(`http://localhost:5000/report`)
+        .then((response) => {
+          let data = response.data;
+          this.reports = data.filter(
+            (array) => array.member_id == this.info.member_id
+          );
+          this.reports.forEach((item) => {
+            let amount = this.countReply(item.report_id); // <-- Call Function please wait for return
+            console.log(amount+"สอง") 
+          });
+          this.reports.reverse(); // order by desc
+
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     validate() {
       this.sid = this.info.member_id;
-      this.addgrace()
+      this.report();
     },
   },
 };

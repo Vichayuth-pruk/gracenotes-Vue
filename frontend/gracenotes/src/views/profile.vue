@@ -35,7 +35,7 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/grace"
+              <a class="nav-link" href="/grace"
                 ><i class="fas fa-address-book"></i>
                 บันทึกความดีกิจกรรมเพื่อสังคมและสาธารณะประโยชน์</a
               >

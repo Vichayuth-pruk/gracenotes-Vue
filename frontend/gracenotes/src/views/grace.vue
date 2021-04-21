@@ -207,7 +207,7 @@ export default {
         this.graces = data.filter(
           (array) => array.member_id == this.info.member_id
         );
-        this.graces.reverse();
+        this.graces.reverse(); //order by desc
       })
       .catch((error) => {
         console.log(error);

@@ -35,7 +35,7 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/grace"
+              <a class="nav-link" href="/grace"
                 ><i class="fas fa-address-book"></i>
                 บันทึกความดีกิจกรรมเพื่อสังคมและสาธารณะประโยชน์</a
               >
@@ -176,10 +176,7 @@ export default {
       .get(`http://localhost:5000/grace/${this.$route.params.id}`)
       .then((response) => {
         let data = response.data;
-        this.graces = data.filter(
-          (array) => array.member_id == this.info.member_id
-        );
-        this.graces.reverse();
+        this.graces = data[0]
       })
       .catch((error) => {
         console.log(error);
