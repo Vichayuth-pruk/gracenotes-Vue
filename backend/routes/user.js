@@ -21,11 +21,72 @@ router.get("/user/:id", async function(req, res, next){
     }
 })
 
+router.delete("/user/:id", async function(req, res, next){
+    const uid = req.params.id;
+    const conn = await pool.getConnection()
+    await conn.beginTransaction();
+    try {
+        await conn.query("DELETE FROM comment WHERE member_id = ?;", [uid])
+        await conn.query("DELETE FROM report WHERE member_id = ?;", [uid])
+        await conn.query("DELETE FROM status WHERE member_id = ?;", [uid])
+        let [result, _] = await conn.query("DELETE FROM members WHERE member_id = ?;", [uid])
+        res.json({message: `ดำเนินการลบแล้ว`})
+        await conn.commit();
+    } catch (err) {
+        await conn.rollback();
+        return res.status(400).json(err);
+    } finally {
+        conn.release();
+    }
+})
+
+router.put("/user/level", async function(req, res, next){
+    const type = req.body.level;
+    const sid = req.body.sid;
+    let msg = ""
+    if (type == "teacher"){
+        msg = "ครู"
+    }else{
+        msg = "นักเรียน"
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction();
+    try {
+        let [result, _] = await conn.query("UPDATE members SET member_level=? WHERE member_id = ?;", [type, sid])
+        res.json({message: `ตั้งบทบาทเป็น ${msg} แล้ว`})
+        await conn.commit();
+    } catch (err) {
+        await conn.rollback();
+        return res.status(400).json(err);
+    } finally {
+        conn.release();
+    }
+})
+
 router.get("/user", async function(req, res, next){
     const conn = await pool.getConnection()
     await conn.beginTransaction();
     try {
         let [result, _] = await conn.query("SELECT * FROM members ORDER BY member_id ASC;")
+        res.json(result)
+        await conn.commit();
+    } catch (err) {
+        await conn.rollback();
+        return res.status(400).json(err);
+    } finally {
+        conn.release();
+    }
+})
+
+router.get("/user/search/:id", async function(req, res, next){
+    const key = '%' + req.params.id + '%'
+    const conn = await pool.getConnection()
+    await conn.beginTransaction();
+    try {
+        let [result, _] = await conn.query(`SELECT * FROM members WHERE member_id LIKE ?
+        OR member_fname LIKE ?
+        OR member_lname LIKE ?
+         ORDER BY member_id ASC;`, [key, key, key])
         res.json(result)
         await conn.commit();
     } catch (err) {

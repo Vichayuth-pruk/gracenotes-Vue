@@ -41,4 +41,21 @@ router.get("/report", async function (req, res, next) {
 
 })
 
+router.get("/report/search/:id", async function (req, res, next) {
+    const key = '%' + req.params.id + '%'
+    const conn = await pool.getConnection()
+    await conn.beginTransaction();
+    try {
+        let [result, _] = await conn.query(`SELECT * FROM report WHERE report_topic LIKE ? ORDER BY member_id ASC;`, [key])
+        res.json(result)
+        await conn.commit();
+    } catch (err) {
+        await conn.rollback();
+        return res.status(400).json(err);
+    } finally {
+        conn.release();
+    }
+
+})
+
 exports.router = router;

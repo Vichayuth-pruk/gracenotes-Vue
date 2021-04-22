@@ -17,6 +17,10 @@ import pathAddsocial from '../views/addsocial.vue'
 import pathMsocialedit from '../views/msocialedit.vue'
 import pathMsocial from '../views/msocial.vue'
 import pathSocial from '../views/social.vue'
+import pathMaccount from '../views/maccount.vue'
+import pathMprofile from '../views/mprofile.vue'
+import pathMreport from '../views/mreport.vue'
+import pathReply from '../views/reply.vue'
 
 Vue.use(VueRouter)
 const routes = [
@@ -104,6 +108,26 @@ const routes = [
     path: '/social/:id',
     name: 'social',
     component: pathSocial // set Social as path '/'
+  },
+  {
+    path: '/maccount',
+    name: 'maccount',
+    component: pathMaccount // set Maccount as path '/'
+  },
+  {
+    path: '/mprofile/:id',
+    name: 'mprofile',
+    component: pathMprofile // set Mprofile as path '/'
+  },
+  {
+    path: '/mreport',
+    name: 'mreport',
+    component: pathMreport // set Mreport as path '/'
+  },
+  {
+    path: '/reply/:id',
+    name: 'reply',
+    component: pathReply // set Reply as path '/'
   },
 ]
 const router = new VueRouter({
