@@ -1,11 +1,27 @@
 const express = require("express");
 const path = require("path")
 const pool = require("../config");
+const joi = require('joi')
 
 router = express.Router();
 
+const loginSchema = joi.object({
+    user: joi.string().required(),
+    pass: joi.string().required()
+})
+
+
+
 // coding here !!
 router.post("/login", async function(req, res, next){
+    
+    try{
+        await loginSchema.validateAsync(req.body.form, { abortEarly: false})
+    } catch (err){
+        return res.status(400).json(err)
+    }
+
+
     const user = req.body.form.user
     const pass = req.body.form.pass
     const conn = await pool.getConnection()

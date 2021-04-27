@@ -196,6 +196,7 @@ export default {
       formData.append("dob", this.dob);
       formData.append("address", this.address1 + this.address2);
       formData.append("pass", this.pass);
+      formData.append("repass", this.repass);
       this.images.forEach((image) => {
         formData.append("myImage", image);
       });

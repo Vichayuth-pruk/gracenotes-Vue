@@ -26,23 +26,32 @@
         <label for="user">รหัสนักเรียน</label>
         <input
           type="text"
-          v-model="user"
+          v-model="$v.user.$model" :class="{'is-danger': $v.user.$error}"
           class="form-control"
           placeholder="รหัสนักเรียน"
           name="user"
           maxlength="10"
           required
         />
+        <template v-if="$v.user.$error">
+          <p class="help text-danger" v-if="!$v.user.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.user.maxLength">This field can contain only 10 characters</p>
+        </template>
         <label for="password">รหัสผ่าน</label>
         <input
           type="password"
-          v-model="pass"
+          v-model="$v.pass.$model" :class="{'is-danger': $v.pass.$error}"
           class="form-control"
           placeholder="รหัสผ่าน"
           name="password"
           maxlength="15"
           required
-        /><br />
+        />
+        <template v-if="$v.pass.$error">
+          <p class="help text-danger" v-if="!$v.pass.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.pass.maxLength">This field can contain only 10 characters</p>
+        </template>
+        <br />
         <div class="text-center">
           <input
             type="submit"
@@ -57,6 +66,7 @@
 </template>
 
 <script>
+import {required, maxLength} from 'vuelidate/lib/validators'
 import axios from "axios";
 export default {
   data() {
@@ -72,9 +82,24 @@ export default {
       this.$router.push({ name: "main" });
     }
   },
+  validations:{
+    user:{
+      required,
+      maxLength: maxLength(10)
+    },
+    pass:{
+      required,
+      maxLength: maxLength(10)
+    }
+
+  },
   methods: {
     login() {
-      axios
+
+      this.$v.$touch();
+
+      if(!this.$v.$invalid){
+        axios
         .post("http://localhost:5000/login", {
           form: {
             user: this.user,
@@ -103,7 +128,24 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-    },
+    }
+    else if(!this.$v.user.required && !this.$v.pass.required){
+      alert("Please Insert User ID and Password ")
+    }
+    else if(!this.$v.user.required){
+      alert("Please Insert User ID")
+    }
+    else if(!this.$v.pass.required){
+      alert("Please Insert Password")
+    }
+
+      }
+
+      
+
+
+
+      
   },
 };
 </script>
