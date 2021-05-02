@@ -131,7 +131,7 @@
       <div class="content col-lg-7 col-md-12 col-sm-12 mx-auto" v-if="socials != ''">
         <div class="form-floating">
           <textarea
-            v-model="socials.social_detail"
+            v-model="$v.detail.$model" :class="{'is-danger text-danger': $v.detail.$error}"
             required
             name="detail"
             class="form-control"
@@ -139,6 +139,11 @@
             id="floatingTextarea2"
             style="height: 100px"
           ></textarea>
+          <template v-if="$v.detail.$error">
+          <p class="help text-danger" v-if="!$v.detail.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.detail.minLength">This field must contain at least 10 letter</p>
+        </template>
+          
           <label for="floatingTextarea2">เขียนโพสต์</label>
         </div>
         <p class="text-end my-1">
@@ -152,6 +157,7 @@
             class="btn btn-info"
             value="อัปเดต"
           />
+          
         </p>
 
         <p class="text-end">
@@ -167,6 +173,7 @@
 </template>
 
 <script>
+import {required, minLength} from 'vuelidate/lib/validators'
 import axios from "axios";
 export default {
   data() {
@@ -177,6 +184,15 @@ export default {
       sid: "",
     };
   },
+
+  validations:{
+    detail:{
+      required,
+      minLength: minLength(10)
+
+    }
+  },
+
   created() {
     this.info = JSON.parse(localStorage.getItem("formLogin"));
     if (this.info == null || this.info.s_level != "teacher") {
@@ -200,6 +216,7 @@ export default {
         .then((response) => {
           let data = response.data;
           this.socials = data[0];
+          this.detail = this.socials.social_detail
         })
         .catch((error) => {
           console.log(error);
@@ -238,9 +255,13 @@ export default {
       }
     },
     validate() {
-      this.detail = this.socials.social_detail;
-      this.sid = this.socials.social_id;
+      this.$v.$touch();
+
+      if(!this.$v.$invalid){
+        this.sid = this.socials.social_id;
+        console.log(this.detail)
       this.updateSocial();
+      }
     },
   },
 };

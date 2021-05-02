@@ -146,7 +146,7 @@
 
         <div class="form-floating">
           <textarea
-            v-model="details"
+            v-model="$v.details.$model" :class="{'is-danger text-danger': $v.details.$error}"
             required
             name="detail"
             class="form-control"
@@ -154,6 +154,10 @@
             id="floatingTextarea2"
             style="height: 100px"
           ></textarea>
+          <template v-if="$v.details.$error">
+          <p class="help text-danger" v-if="!$v.details.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.details.minLength">This field must contain at least 10 letters</p>
+        </template>
           <label for="floatingTextarea2">เขียนโพสต์</label>
         </div>
         <br />
@@ -173,6 +177,7 @@
 </template>
 
 <script>
+import {required, minLength} from 'vuelidate/lib/validators'
 import axios from "axios";
 export default {
   data() {
@@ -183,6 +188,21 @@ export default {
       img: "",
       uid: "",
     };
+  },
+  validations:{
+    img:{
+      required,
+      
+    },
+    details:{
+      required,
+      minLength: minLength(10)
+      
+    },
+    uid:{
+      required,
+      
+    }
   },
   created() {
     this.info = JSON.parse(localStorage.getItem("formLogin"));

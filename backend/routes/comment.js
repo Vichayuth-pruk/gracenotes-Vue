@@ -1,7 +1,10 @@
 const express = require("express");
 const pool = require("../config");
+const joi = require('joi')
 
 router = express.Router();
+
+
 
 router.get("/comment/social/:id", async function (req, res, next) {
     const conn = await pool.getConnection();
@@ -33,7 +36,28 @@ router.delete("/comment/:id", async function (req, res, next) {
     }
 })
 
+const commentSchema = joi.object({
+    
+    
+    detail: joi.string().required(),
+    sid: joi.any().required(),
+    uid: joi.any().required()
+    
+    
+    
+    
+})
+
 router.post("/comment", async function (req, res, next) {
+
+    try{
+        await commentSchema.validateAsync(req.body, { abortEarly: false})
+    } catch (err){
+        console.log(req.body.detail)
+        return res.status(400).json(err);
+    }
+
+
     const detail = req.body.detail
     const sid = req.body.sid
     const uid = req.body.uid

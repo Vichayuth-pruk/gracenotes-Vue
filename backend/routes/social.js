@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path")
 const pool = require("../config");
+const joi = require('joi')
 
 router = express.Router();
 
@@ -36,7 +37,29 @@ router.get("/social/:id", async function(req, res, next){
     }
 })
 
+const search =  (value, helpers) => {
+    if(value[0] == " "){
+        throw new joi.ValidationError("spacebar at first string is not allowed")
+    }
+    
+
+    
+
+}
+
+const searchSchema = joi.object().keys({
+    id: joi.number().required().custom(search)
+})
+
 router.get("/social/search/:id", async function(req, res, next){
+
+    try{
+        await searchSchema.validateAsync(req.params, { abortEarly: false})
+    } catch (err){
+        console.log(req.params.id)
+        return res.status(400).json(err)
+    }
+
     const key = '%' + req.params.id + '%'
     const conn = await pool.getConnection()
     await conn.beginTransaction();
@@ -54,7 +77,20 @@ router.get("/social/search/:id", async function(req, res, next){
     }
 })
 
+const upsocialSchema = joi.object({
+    detail: joi.string().required().min(10),
+    sid: joi.any().required()
+})
+
 router.put("/social/:id", async function(req, res, next){
+
+    try{
+        await upsocialSchema.validateAsync(req.body, { abortEarly: false})
+    } catch (err){
+        console.log(req.body.sid)
+        return res.status(401).json(err)
+    }
+
     const detail = req.body.detail
     const sid = req.body.sid
 
@@ -87,7 +123,21 @@ router.delete("/social/:id", async function(req, res, next){
     }
 })
 
+const addsocialSchema = joi.object({
+    img: joi.string().required(),
+    detail: joi.string().required().min(10),
+    uid: joi.any().required()
+})
+
 router.post("/social", async function(req, res, next){
+
+    try{
+        await addsocialSchema.validateAsync(req.body, { abortEarly: false})
+    } catch (err){
+        console.log(req.body.sid)
+        return res.status(401).json(err)
+    }
+
     const img = req.body.img
     const detail = req.body.detail
     const uid = req.body.uid

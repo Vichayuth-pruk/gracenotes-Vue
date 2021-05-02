@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path")
 const pool = require("../config");
+const joi = require('joi')
 
 router = express.Router();
 
@@ -36,8 +37,25 @@ router.get("/grace", async function (req, res, next) {
     }
 })
 
+const search = (value, helpers) => {
+        if(value[0] == " "){
+            throw new joi.ValidationError("spacebar at first string is not allowed")
+        }
+}
+
 // coding here !!
+const searchSchema = joi.object().keys({
+    sr: joi.string().required().custom(search)
+})
+
 router.get("/grace/search/:sr", async function (req, res, next) {
+
+    try{
+        await searchSchema.validateAsync(req.params, { abortEarly: false})
+    } catch (err){
+        return res.status(400).json(err)
+    }
+
     const key = '%' + req.params.sr + '%'
     const conn = await pool.getConnection()
     await conn.beginTransaction();
@@ -72,7 +90,28 @@ router.get("/grace/:id", async function (req, res, next) {
     }
 })
 
+const upgrace =  (value, helpers) => {
+    if (!(value == "รอการอนุมัติ" || value == "ผ่าน" || value == "ไม่ผ่าน")){
+        throw new joi.ValidationError("Wrong status type")
+    }
+    
+}
+
+
+const upgraceSchema = joi.object({
+        value: joi.string().required().custom(upgrace)
+})
+
+
 router.put("/grace/:id", async function (req, res, next) { 
+
+    try{
+        await upgraceSchema.validateAsync(req.body, { abortEarly: false})
+        
+    } catch (err){
+        return res.status(400).json(err)
+    }
+    
     const conn = await pool.getConnection()
     await conn.beginTransaction();
     try {
@@ -102,7 +141,24 @@ router.delete("/grace/:id", async function (req, res, next) {
     }
 })
 
+const graceSchema = joi.object({
+    time: joi.string().required().pattern(/[0-2]{1}[0-9]{1}:[0-6]{1}[0-9]{1}/),
+    date: joi.date().iso().max(Date.now()).required(),
+    detail: joi.string().required().min(10),
+    agency: joi.string().required().min(5),
+    sid: joi.any().required(),
+})
+
 router.post("/grace", upload.array("myImage", 5), async function (req, res, next) {
+
+    try{
+        await graceSchema.validateAsync(req.body, { abortEarly: false})
+    } catch (err){
+        return res.status(400).json(err)
+    }
+
+
+
     if (req.method == "POST") {
         const file = req.files;
         let pathArray = [];

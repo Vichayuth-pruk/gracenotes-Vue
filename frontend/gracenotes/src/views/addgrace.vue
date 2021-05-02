@@ -103,35 +103,46 @@
         <label for="time">จำนวนเวลาที่ทำความดี</label>
         <input
           type="time"
-          v-model="time"
+          v-model="$v.time.$model" :class="{'is-danger text-danger': $v.time.$error}"
           class="form-control"
           name="time"
           required
         />
+        <template v-if="$v.time.$error">
+          <p class="help text-danger" v-if="!$v.time.required">Thisfield is required</p>
+        </template>
         <label for="date">วันที่ทำความดี</label>
         <input
           type="date"
-          v-model="date"
+          v-model="$v.date.$model" :class="{'is-danger text-danger': $v.date.$error}"
           class="form-control"
           name="date"
           required
         />
+        <template v-if="$v.date.$error">
+          <p class="help text-danger" v-if="!$v.date.required">Thisfield is required</p>
+          <p class="help text-danger" v-if="!$v.date.date">Please insert date correctly</p>
+        </template>
         <div class="form-floating mt-3">
           <textarea
             class="form-control"
-            v-model="detail"
+            v-model="$v.detail.$model" :class="{'is-danger text-danger': $v.detail.$error}"
             placeholder="รายละเอียดการทำความดี"
             name="detail"
             style="height: 80px"
             id="floatingTextarea"
             required
           ></textarea>
+          <template v-if="$v.detail.$error">
+          <p class="help text-danger" v-if="!$v.detail.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.detail.minLength">This field must contain at least 10 letters</p>
+        </template>
           <label for="floatingTextarea">รายละเอียดการทำความดี</label>
         </div>
         <div class="form-floating mb-3 mt-3">
           <input
             type="text"
-            v-model="agency"
+            v-model="$v.agency.$model" :class="{'is-danger text-danger': $v.agency.$error}"
             class="form-control"
             id="floatingInput"
             name="agency"
@@ -139,6 +150,10 @@
             maxlength="50"
             required
           />
+          <template v-if="$v.agency.$error">
+          <p class="help text-danger" v-if="!$v.agency.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.agency.minLength">This field must contain at least 5 letters</p>
+        </template>
           <label for="floatingInput">หน่วยงานที่ทำความดี</label>
         </div>
         <div v-for="image in images" :key="image.id">
@@ -157,7 +172,11 @@
           accept="image/png, image/jpeg, image/webp"
           @change="selectImages"
           required
-        /><br />
+        />
+        <template v-if="$v.images.$error">
+          <p class="help text-danger" v-if="!$v.images.images">Must Upload The picture</p>
+        </template>
+        <br />
         <p class="text-center">
           <input
             type="submit"
@@ -173,7 +192,16 @@
 </template>
 
 <script>
+import {required, minLength} from 'vuelidate/lib/validators'
 import axios from "axios";
+
+function images(){
+   return (!(this.images.length == 0) )
+}
+
+
+
+
 export default {
   data() {
     return {
@@ -186,6 +214,33 @@ export default {
       sid: "",
     };
   },
+
+  validations:{
+    time:{
+      required,
+      
+      
+    },
+    date:{
+      required,
+      maxValue: value => value < new Date().toISOString(),
+    },
+    detail:{
+      required,
+      minLength: minLength(10)
+    },
+    agency:{
+      required,
+      minLength: minLength(5)
+      
+    },
+    images:{
+      required,
+      images: images
+    },
+
+  },
+  
   created() {
     this.info = JSON.parse(localStorage.getItem("formLogin"));
     if (this.info == null) {
@@ -231,8 +286,11 @@ export default {
       });
     },
     validate() {
+      this.$v.$touch();
+      if(!this.$v.$invalid){
       this.sid = this.info.member_id;
       this.addgrace()
+      }
     },
   },
 };

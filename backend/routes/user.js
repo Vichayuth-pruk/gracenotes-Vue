@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("path")
 const pool = require("../config");
+const joi = require('joi')
+
 
 router = express.Router();
 
@@ -78,7 +80,29 @@ router.get("/user", async function(req, res, next){
     }
 })
 
+const search = (value, helpers) => {
+    if(value[0] == " "){
+        throw new joi.ValidationError("spacebar at first string is not allowed")
+    }
+}
+
+const searchSchema = joi.object({
+    
+    id: joi.string().required().custom(search)
+    
+    
+    
+    
+    
+})
+
 router.get("/user/search/:id", async function(req, res, next){
+    try{
+        await searchSchema.validateAsync(req.params, { abortEarly: false})
+    } catch (err){
+        return res.status(400).json(err);
+    }
+
     const key = '%' + req.params.id + '%'
     const conn = await pool.getConnection()
     await conn.beginTransaction();

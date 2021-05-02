@@ -7,8 +7,8 @@ const joi = require('joi')
 router = express.Router();
 
 const no_validate = (value, helpers) => {
-    if(!(value.match(/[0-9]/)) || (value[0] == "0" || value[0] == ".")){
-        throw new joi.ValidationError("Please insert the number correctly")
+    if(!(value.match(/[0-9]{2}/) && !(value.match(/^[a-zA-Z]+$/)))){
+        throw new joi.ValidationError("Please insert the number correctly (2 digits)")
     }
     else if(parseInt(value) > 50){
         throw new joi.ValidationError("Limit number is 50 only")
@@ -37,6 +37,7 @@ const user_validate = async (value, helpers) => {
     if(rows.length > 0){
         const message = "This user is alredy taken"
         throw new joi.ValidationError(message, { message })
+        
     }
     return value
     
@@ -53,9 +54,9 @@ const signupSchema = joi.object({
     fname: joi.string().required().max(150),
     lname: joi.string().required().max(150),
     classes: joi.string().required().pattern(/[1-6]{1}[/]{1}[1-6]{1}/),
-    no: joi.string().required().min(1).max(2).custom(no_validate),
+    no: joi.string().required().min(2).max(2).custom(no_validate),
     dob: joi.date().iso().max(Date.now()).required(),
-    address: joi.string().required().min(15),
+    address: joi.string().required().min(20),
     pass: joi.string().required().min(5).custom(pass_validate),
     repass: joi.string().required().valid(joi.ref('pass')),
     
@@ -86,22 +87,31 @@ const upload = multer({ storage: storage });
 // coding here !!
 router.post("/register", upload.array("myImage", 5), async function (req, res, next) {
 
-    
+
+    try{
+        await signupSchema.validateAsync(req.body, { abortEarly: false})
+    } catch (err){
+        return res.json({ message: err.message, status: false });
+    }
+
+    const file = req.files;
+        
+        let pathArray = [];
+        if (!file) {
+            return res.status(400).json({ message: "โปรดอัปโหลดรูปประจำตัว" });
+        }
+
     
 
 
     if (req.method == "POST") {
 
-        try{
-            await signupSchema.validateAsync(req.body, { abortEarly: false})
-        } catch (err){
-            
-            return res.status(401).json(err)
-        }
+        
 
 
 
         const file = req.files;
+        
         let pathArray = [];
         if (!file) {
             return res.status(400).json({ message: "โปรดอัปโหลดรูปประจำตัว" });
@@ -143,7 +153,7 @@ router.post("/register", upload.array("myImage", 5), async function (req, res, n
                     [pathArray[0][1], memId]
                 );
             }
-            res.json({message: 'สมัครสมาชิกสำเร็จ', status: true})
+            res.json({ message: 'สมัครสมาชิกสำเร็จ', status: true })
             await conn.commit();
         } catch (err) {
             await conn.rollback();

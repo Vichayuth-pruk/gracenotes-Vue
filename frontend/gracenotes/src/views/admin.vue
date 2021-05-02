@@ -116,12 +116,16 @@
       <div class="row my-3">
         <div class="col-auto">
           <input
-            v-model="sr"
+            v-model="$v.sr.$model" :class="{'is-danger text-danger': $v.sr.$error}"
             type="text"
             class="form-control"
             placeholder="ค้นหา"
             required
           />
+          <template v-if="$v.sr.$error">
+          <p class="help text-danger" v-if="!$v.sr.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.sr.search">spacebar at first string is not allowed</p>
+        </template>
         </div>
         <div class="col-auto">
           <button @click="validate()" type="submit" class="btn btn-info">
@@ -301,7 +305,18 @@
 </template>
 
 <script>
+import {required} from 'vuelidate/lib/validators'
 import axios from "axios";
+
+function search(value){
+  if(value[0] == " "){
+    return false
+  }
+
+  return true
+}
+
+
 export default {
   data() {
     return {
@@ -312,6 +327,13 @@ export default {
       sr: "",
     };
   },
+  validations:{
+    sr:{
+      required,
+      search: search
+      }
+    },
+  
   created() {
     this.info = JSON.parse(localStorage.getItem("formLogin"));
     if (this.info == null || this.info.s_level != "teacher") {
@@ -370,7 +392,13 @@ export default {
         });
     },
     validate() {
-      this.searchGrace();
+      this.$v.$touch();
+      
+      if(!this.$v.$invalid){
+        this.searchGrace();
+      }
+
+      
     },
   },
 };

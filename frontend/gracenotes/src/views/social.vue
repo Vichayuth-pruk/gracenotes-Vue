@@ -156,13 +156,17 @@
         <div class="row">
           <div class="col-7 ms-auto">
             <input
-              v-model="comm"
+              v-model="$v.comm.$model" :class="{'is-danger text-danger': $v.comm.$error}"
               type="text"
               class="form-control"
               required
               name="comment"
               placeholder="เขียนความคิดเห็น"
             />
+            <template v-if="$v.comm.$error">
+          
+          <p class="help text-danger" v-if="!$v.comm.comm">This field is required</p>
+        </template>
           </div>
           <div class="col-auto me-auto">
             <input
@@ -209,6 +213,7 @@
 </template>
 
 <script>
+import {required} from 'vuelidate/lib/validators'
 import axios from "axios";
 export default {
   data() {
@@ -244,6 +249,19 @@ export default {
         console.log(error);
       });
   },
+
+  validations:{
+    comm:{
+      required,
+    },
+    
+
+  },
+
+  
+
+
+
   methods: {
     showStatus() {
       axios
@@ -359,9 +377,18 @@ export default {
         });
     },
     validate() {
-      this.uid = this.info.member_id;
-      this.sid = this.socials.social_id;
+      
+      this.$v.$touch();
+      
+      if(!this.$v.$invalid){
+        this.uid = this.info.member_id;
+        this.sid = this.socials.social_id;
       this.comment();
+      }
+      else{
+        alert("please write comment")
+      }
+      
     },
   },
 };

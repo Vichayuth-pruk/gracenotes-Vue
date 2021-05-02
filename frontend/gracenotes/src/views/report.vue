@@ -105,23 +105,32 @@
           <label for="head">หัวข้อ</label>
           <input
             type="text"
-            v-model="head"
+            v-model="$v.head.$model" :class="{'is-danger text-danger': $v.head.$error}"
             class="form-control"
             placeholder="หัวข้อ"
             name="head"
             maxlength="100"
             required
           />
+          <template v-if="$v.head.$error">
+          <p class="help text-danger" v-if="!$v.head.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.head.minLength">This field must contain at least 5 letters</p>
+          <p class="help text-danger" v-if="!$v.head.maxLength">This field can contain 100 letters</p>
+        </template>
           <label for="body">รายละเอียด</label>
           <textarea
             name="body"
-            v-model="body"
+            v-model="$v.body.$model" :class="{'is-danger text-danger': $v.body.$error}"
             class="form-control"
             placeholder="รายะเอียด"
             cols="30"
             rows="2"
             required
           ></textarea>
+          <template v-if="$v.body.$error">
+          <p class="help text-danger" v-if="!$v.body.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.body.minLength">This field must contain at least 10 letters</p>
+        </template>
           <br />
           <p class="text-center">
             <input
@@ -190,6 +199,7 @@
 </template>
 
 <script>
+import {required, maxLength, minLength} from 'vuelidate/lib/validators'
 import axios from "axios";
 export default {
   data() {
@@ -201,7 +211,23 @@ export default {
       body: "",
       sid: "",
     };
+    
   },
+  validations:{
+    head:{
+      required,
+      minLength: minLength(5),
+      maxLength: maxLength(100)
+      
+    },
+    body:{
+      required,
+      minLength: minLength(10),
+
+      
+    }
+  },
+  
   created() {
     this.info = JSON.parse(localStorage.getItem("formLogin"));
     if (this.info == null) {
@@ -261,8 +287,12 @@ export default {
         });
     },
     validate() {
-      this.sid = this.info.member_id;
+      this.$v.$touch();
+
+      if(!this.$v.$invalid){
+        this.sid = this.info.member_id;
       this.report();
+      }
     },
   },
 };
