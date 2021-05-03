@@ -42,6 +42,25 @@ const user_validate = async (value, helpers) => {
     return value
     
     }
+
+const number = (value, helpers) => {
+        if(value == 0 || value == ""){
+            throw new joi.ValidationError("Please insert number correctly")
+        }
+        return value
+    }
+const fname = (value, helpers) => {
+        if(value.match(/[0-9]/)){
+            throw new joi.ValidationError("No numeric allowed")
+        }
+        return value
+    }
+const lname = (value, helpers) => {
+        if(value.match(/[0-9]/)){
+            throw new joi.ValidationError("No numeric allowed")
+        }
+        return value
+    }
     
 
     
@@ -51,13 +70,13 @@ const signupSchema = joi.object({
     
     
     user: joi.string().required().max(8).min(8).external(user_validate),
-    fname: joi.string().required().max(150),
-    lname: joi.string().required().max(150),
+    fname: joi.string().required().max(30).custom(fname),
+    lname: joi.string().required().max(30).custom(lname),
     classes: joi.string().required().pattern(/[1-6]{1}[/]{1}[1-6]{1}/),
-    no: joi.string().required().min(2).max(2).custom(no_validate),
+    no: joi.number().required().min(1).max(60).integer().custom(number),
     dob: joi.date().iso().max(Date.now()).required(),
-    address: joi.string().required().min(20),
-    pass: joi.string().required().min(5).custom(pass_validate),
+    address: joi.string().required().min(20).max(510),
+    pass: joi.string().required().min(5).max(15).custom(pass_validate),
     repass: joi.string().required().valid(joi.ref('pass')),
     
     
@@ -125,6 +144,7 @@ router.post("/register", upload.array("myImage", 5), async function (req, res, n
         const dob = req.body.dob;
         const address = req.body.address;
         const pass = req.body.pass;
+
         
 
 

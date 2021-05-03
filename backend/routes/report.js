@@ -62,7 +62,25 @@ router.get("/report", async function (req, res, next) {
 
 })
 
+const search = (value, helpers) => {
+    if(value[0] == " "){
+        throw new joi.ValidationError("spacebar at first string is not allowed")
+    }
+}
+
+
+const searchSchema = joi.object().keys({
+    sr: joi.string().required().custom(search)
+})
+
 router.get("/report/search/:id", async function (req, res, next) {
+
+    try{
+        await searchSchema.validateAsync(req.papams, { abortEarly: false})
+    } catch (err){
+        return res.status(400).json(err);
+    }
+
     const key = '%' + req.params.id + '%'
     const conn = await pool.getConnection()
     await conn.beginTransaction();

@@ -126,7 +126,7 @@
             <label for="fname">ชื่อ</label>
             <input
               type="text"
-              v-model="formMembers.member_fname"
+              v-model="$v.fname.$model" :class="{'is-danger text-danger': $v.fname.$error}"
               class="form-control"
               name="fname"
               value=""
@@ -134,85 +134,119 @@
               maxlength="30"
               required
             />
+             <template v-if="$v.fname.$error">
+          <p class="help text-danger" v-if="!$v.fname.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.fname.maxLength">This field can contain only 30 characters</p>
+        </template>
           </div>
           <div class="col">
             <label for="lname">นามสกุล</label>
             <input
               type="text"
-              v-model="formMembers.member_lname"
+              v-model="$v.lname.$model" :class="{'is-danger text-danger': $v.lname.$error}"
               class="form-control"
               name="lname"
               placeholder="นามสกุล"
               maxlength="30"
               required
             />
+            
+            <template v-if="$v.lname.$error">
+          <p class="help text-danger" v-if="!$v.lname.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.lname.maxLength">This field can contain only 30 characters</p>
+        </template>
           </div>
         </div>
         <label for="class">ห้องเรียน</label>
         <input
           type="text"
-          v-model="formMembers.member_class"
+          v-model="$v.class.$model" :class="{'is-danger text-danger': $v.class.$error}"
           class="form-control"
           name="class"
           value=""
           placeholder="ห้องเรียน"
-          maxlength="5"
+          maxlength="3"
           required
         />
+        <template v-if="$v.class.$error">
+          <p class="help text-danger" v-if="!$v.class.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.class.classes">Please Insert class correctly</p>
+        </template>
         <label for="no">เลขที่</label>
         <input
-          type="number"
-          v-model="formMembers.member_no"
+          type="text"
+          v-model="$v.no.$model" :class="{'is-danger text-danger': $v.no.$error}"
           class="form-control"
+          placeholder="เลขที่ เช่น 5, 34"
           name="no"
-          value=""
-          placeholder="เลขที่"
+          maxlength="2"
           min="1"
           max="99"
           required
         />
+        <template v-if="$v.no.$error">
+          <p class="help text-danger" v-if="!$v.no.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.no.numeric">Please Insert number correctly (2 digits)</p>
+          <p class="help text-danger" v-if="!$v.no.no2">Limit number at 60 only</p>
+        </template>
         <label for="dob">วัน/เดือน/ปี เกิด</label>
         <input
           type="date"
-          v-model="formMembers.member_dob"
+          v-model="$v.dob.$model" :class="{'is-danger text-danger': $v.dob.$error}"
           class="form-control"
           name="dob"
           value=""
           placeholder="วัน/เดือน/ปี เกิด"
           required
         />
+        <template v-if="$v.dob.$error">
+          <p class="help text-danger" v-if="!$v.dob.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.dob.maxValue">Please Insert Date correctly</p>
+        </template>
         <label for="address">ที่อยู่</label>
         <input
           type="text"
-          v-model="formMembers.member_address"
+          v-model="$v.address.$model" :class="{'is-danger text-danger': $v.address.$error}"
           class="form-control"
           name="address"
           value=""
           placeholder="ที่อยู่"
           required
         />
+        <template v-if="$v.address.$error">
+          <p class="help text-danger" v-if="!$v.address.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.address.maxLength">This field can contain only 510 characters</p>
+          <p class="help text-danger" v-if="!$v.address.minLength">This field must contain at least 20 characters</p>
+        </template>
         <label for="pass">รหัสผ่านใหม่</label>
         <input
           type="password"
-          v-model="pass"
+          v-model="$v.pass.$model" :class="{'is-danger text-danger': $v.pass.$error}"
           class="form-control"
           name="pass"
-          value=""
           placeholder="รหัสผ่านใหม่"
           maxlength="15"
           required
         />
+        <template v-if="$v.pass.$error">
+          <p class="help text-danger" v-if="!$v.pass.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.pass.pass">Password must be harder (include Capital letter, Alphabet ,number)</p>
+          <p class="help text-danger" v-if="!$v.pass.minLength">Password must contain at least 5 character </p>
+        </template>
         <label for="repass">ยืนยันรหัสผ่านใหม่</label>
         <input
           type="password"
-          v-model="repass"
+          v-model="$v.repass.$model" :class="{'is-danger text-danger': $v.repass.$error}"
           class="form-control"
           name="repass"
-          value=""
           placeholder="ยืนยันรหัสผ่านใหม่"
           maxlength="15"
           required
         />
+        <template v-if="$v.repass.$error">
+          <p class="help text-danger" v-if="!$v.repass.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.repass.repass">Muse be the same as password</p>
+        </template>
         <br />
         <p class="text-center">
           <input
@@ -229,16 +263,86 @@
 </template>
 
 <script>
+import {required, maxLength, minLength, sameAs, numeric} from 'vuelidate/lib/validators'
 import axios from "axios";
+
+
+function classes(value){
+  return !!(value.match(/[1-6]{1}[/]{1}[1-6]{1}/))
+}
+
+
+
+function no2(value){
+  return !(parseInt(value) > 60)
+}
+
+function pass(value){
+  if(!(value.match(/[0-9]/) && value.match(/[a-z]/) && value.match(/[A-Z]/) )){
+    return false
+  }
+  return true
+}
+
 export default {
   data() {
     return {
       info: null,
       formMembers: "",
+      fname: "",
+      lname: "",
+      class: "",
+      no: "",
+      dob: "",
+      address: "",
       pass: "",
       repass: "",
     };
   },
+
+  validations:{
+    fname:{
+      required,
+      maxLength: maxLength(30)
+    },
+    lname:{
+      required,
+      maxLength: maxLength(30)
+    },
+    class:{
+      required,
+      classes: classes
+    },
+    no:{
+      required,
+      numeric: numeric,
+      no2: no2,
+    },
+    dob:{
+      required,
+      maxValue: value => value < new Date().toISOString(),
+      
+    },
+    address:{
+      required,
+      minLength: minLength(20),
+      maxLength: maxLength(510)
+    },
+
+    pass:{
+      required,
+      minLength: minLength(5),
+      maxLength: maxLength(15),
+      pass: pass
+    },
+    repass:{
+      required,
+      repass: sameAs('pass')
+    },
+
+
+  },
+
   created() {
     this.info = JSON.parse(localStorage.getItem("formLogin"));
     if (this.info == null) {
@@ -255,14 +359,21 @@ export default {
         };
         // iso date to short date
         this.formMembers.member_dob = this.formMembers.member_dob.substr(0, 10);
+        this.fname = this.formMembers.member_fname
+        this.lname = this.formMembers.member_lname
+        this.class = this.formMembers.member_class
+        this.no = this.formMembers.member_no
+        this.dob = this.formMembers.member_dob
+        this.address = this.formMembers.member_address
       })
       .catch((error) => {
         console.log(error);
       });
   },
   methods: {
+    
     update() {
-      console.log(this.formMembers);
+      
       axios
         .put(`http://localhost:5000/user`, {
             form: this.formMembers
@@ -277,9 +388,21 @@ export default {
         });
     },
     validate() {
+      this.$v.$touch();
+
+      if(!this.$v.$invalid){
+        this.formMembers.member_fname = this.fname
+      this.formMembers.member_lname = this.lname
+      this.formMembers.member_class = this.class
+      this.formMembers.member_no = this.no
+      this.formMembers.member_dob = this.dob
+      this.formMembers.member_address = this.address
         this.formMembers.member_password = this.pass
         this.formMembers.sid = this.formMembers.member_id
+        
         this.update()
+      }
+  
     },
   },
 };

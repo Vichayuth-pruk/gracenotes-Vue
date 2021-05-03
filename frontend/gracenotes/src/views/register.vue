@@ -54,7 +54,7 @@
             />
             <template v-if="$v.fname.$error">
           <p class="help text-danger" v-if="!$v.fname.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.fname.maxLength">This field can contain only 150 characters</p>
+          <p class="help text-danger" v-if="!$v.fname.maxLength">This field can contain only 30 characters</p>
         </template>
           </div>
           <div class="col">
@@ -70,7 +70,7 @@
             />
             <template v-if="$v.lname.$error">
           <p class="help text-danger" v-if="!$v.lname.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.lname.maxLength">This field can contain only 150 characters</p>
+          <p class="help text-danger" v-if="!$v.lname.maxLength">This field can contain only 30 characters</p>
         </template>
           </div>
         </div>
@@ -93,7 +93,7 @@
           type="text"
           v-model="$v.no.$model" :class="{'is-danger text-danger': $v.no.$error}"
           class="form-control"
-          placeholder="เลขที่ เช่น 05, 34"
+          placeholder="เลขที่ เช่น 5, 34"
           name="no"
           maxlength="2"
           min="1"
@@ -209,7 +209,7 @@
   </div>
 </template>
 <script>
-import {required, maxLength, minLength, sameAs} from 'vuelidate/lib/validators'
+import {required, maxLength, minLength, sameAs, numeric} from 'vuelidate/lib/validators'
 import axios from "axios";
 
 
@@ -218,9 +218,6 @@ function user(value){
 }
 function classes(value){
   return !!(value.match(/[1-6]{1}[/]{1}[1-6]{1}/))
-}
-function no(value){
-  return !!(value.match(/[0-9]{2}/) && !(value.match(/^[a-zA-Z]+$/)))
 }
 function no2(value){
   return !(parseInt(value) > 50)
@@ -267,11 +264,11 @@ export default {
     },
     fname:{
       required,
-      maxLength: maxLength(150)
+      maxLength: maxLength(30)
     },
     lname:{
       required,
-      maxLength: maxLength(150)
+      maxLength: maxLength(30)
     },
     classes:{
       required,
@@ -279,7 +276,7 @@ export default {
     },
     no:{
       required,
-      no: no,
+      numeric: numeric,
       no2: no2
     },
     dob:{
@@ -302,6 +299,7 @@ export default {
     pass:{
       required,
       minLength: minLength(5),
+      maxLength: maxLength(15),
       pass: pass
     },
     repass:{

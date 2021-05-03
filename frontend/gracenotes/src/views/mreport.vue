@@ -116,13 +116,16 @@
       <div class="row my-3">
         <div class="col-auto">
           <input
-            v-model="sr"
+            v-model="$v.sr.$model" :class="{'is-danger text-danger': $v.sr.$error}"
             type="text"
             class="form-control"
             placeholder="ค้นหา"
             name="key"
             required
           />
+          <template v-if="$v.sr.$error">
+          <p class="help text-danger" v-if="!$v.sr.required">This field is required</p>
+        </template>
         </div>
         <div class="col-auto">
           <button @click="validate()" type="submit" class="btn btn-info">
@@ -164,6 +167,7 @@
 </template>
 
 <script>
+import {required} from 'vuelidate/lib/validators'
 import axios from "axios";
 export default {
   data() {
@@ -173,6 +177,11 @@ export default {
       replys: "",
       sr: "",
     };
+  },
+  validations:{
+    sr:{
+      required: required
+    }
   },
   created() {
     this.info = JSON.parse(localStorage.getItem("formLogin"));
@@ -229,7 +238,10 @@ export default {
         });
     },
     validate() {
-      this.search();
+      this.$v.$touch();
+      if(!this.$v.$invalid){
+        this.search()
+      }
     },
   },
 };

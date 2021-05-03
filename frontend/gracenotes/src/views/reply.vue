@@ -135,7 +135,7 @@
       <div class="my-3 mx-auto col-lg-6 col-md-12 col-sm-12">
         <label for="detail">ตอบกลับ</label>
         <input
-          v-model="detail"
+          v-model="$v.detail.$model" :class="{'is-danger text-danger': $v.detail.$error}"
           type="text"
           placeholder="ตอบกลับ"
           class="form-control"
@@ -143,6 +143,10 @@
           name="detail"
           id=""
         />
+        <template v-if="$v.detail.$error">
+          <p class="help text-danger" v-if="!$v.detail.required">This field is required</p>
+          <p class="help text-danger" v-if="!$v.detail.minLength">This field must contain at least 5 character </p>
+        </template>
         <p class="text-center my-3">
           <input
             @click="validate()"
@@ -179,6 +183,7 @@
 </template>
 
 <script>
+import {required, minLength} from 'vuelidate/lib/validators'
 import axios from "axios";
 export default {
   data() {
@@ -191,6 +196,15 @@ export default {
       uid: "",
     };
   },
+
+  validations:{
+    detail:{
+      required,
+      minLength: minLength(5)
+    },
+
+  },
+
   created() {
     this.info = JSON.parse(localStorage.getItem("formLogin"));
     if (this.info == null || this.info.s_level != "teacher") {
@@ -258,9 +272,14 @@ export default {
       }
     },
     validate() {
-      this.sid = this.reports.report_id;
+      this.$v.$touch();
+
+      if(!this.$v.$invalid){
+        this.sid = this.reports.report_id;
       this.uid = this.info.member_id;
       this.reply();
+      }
+      
     },
   },
 };

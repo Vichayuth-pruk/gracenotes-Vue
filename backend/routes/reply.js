@@ -1,5 +1,6 @@
 const express = require("express");
 const pool = require("../config");
+const joi = require('joi')
 
 router = express.Router();
 
@@ -33,7 +34,26 @@ router.delete("/reply/:id", async function (req, res, next) {
     }
 })
 
+const reportSchema = joi.object({
+    
+    
+    detail: joi.string().required().min(5),
+    sid: joi.any().required(),
+    uid: joi.any().required()
+    
+    
+    
+    
+})
+
 router.post("/reply", async function (req, res, next) {
+
+    try{
+        await reportSchema.validateAsync(req.body, { abortEarly: false})
+    } catch (err){
+        return res.status(400).json(err)
+    }
+
     const detail = req.body.detail;
     const sid = req.body.sid;
     const uid = req.body.uid;
