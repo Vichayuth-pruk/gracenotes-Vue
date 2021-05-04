@@ -109,12 +109,10 @@
             class="form-control"
             placeholder="หัวข้อ"
             name="head"
-            maxlength="100"
             required
           />
           <template v-if="$v.head.$error">
           <p class="help text-danger" v-if="!$v.head.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.head.minLength">This field must contain at least 5 letters</p>
           <p class="help text-danger" v-if="!$v.head.maxLength">This field can contain 100 letters</p>
         </template>
           <label for="body">รายละเอียด</label>
@@ -129,7 +127,6 @@
           ></textarea>
           <template v-if="$v.body.$error">
           <p class="help text-danger" v-if="!$v.body.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.body.minLength">This field must contain at least 10 letters</p>
         </template>
           <br />
           <p class="text-center">
@@ -199,7 +196,7 @@
 </template>
 
 <script>
-import {required, maxLength, minLength} from 'vuelidate/lib/validators'
+import {required, maxLength} from 'vuelidate/lib/validators'
 import axios from "axios";
 export default {
   data() {
@@ -216,13 +213,12 @@ export default {
   validations:{
     head:{
       required,
-      minLength: minLength(5),
       maxLength: maxLength(100)
       
     },
     body:{
       required,
-      minLength: minLength(10),
+
 
       
     }

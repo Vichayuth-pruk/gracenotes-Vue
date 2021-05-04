@@ -37,8 +37,7 @@
         <template v-if="$v.user.$error">
           <p class="help text-danger" v-if="!$v.user.required">This field is required</p>
           <p class="help text-danger" v-if="!$v.user.user">Please insert user ID correctly</p>
-          <p class="help text-danger" v-if="!$v.user.maxLength">This field can contain only 8 characters</p>
-          
+          <p class="help text-danger" v-if="!$v.user.maxLength">This field can contain only 10 digits</p>
         </template>
         <div class="row g-2">
           <div class="col">
@@ -49,12 +48,12 @@
               class="form-control"
               placeholder="ชื่อ"
               name="fname"
-              maxlength="30"
               required
             />
             <template v-if="$v.fname.$error">
           <p class="help text-danger" v-if="!$v.fname.required">This field is required</p>
           <p class="help text-danger" v-if="!$v.fname.maxLength">This field can contain only 30 characters</p>
+          <p class="help text-danger" v-if="!$v.fname.fullname">No numeric allowed</p>
         </template>
           </div>
           <div class="col">
@@ -65,12 +64,12 @@
               class="form-control"
               placeholder="นามสกุล"
               name="lname"
-              maxlength="30"
               required
             />
             <template v-if="$v.lname.$error">
           <p class="help text-danger" v-if="!$v.lname.required">This field is required</p>
           <p class="help text-danger" v-if="!$v.lname.maxLength">This field can contain only 30 characters</p>
+          <p class="help text-danger" v-if="!$v.lname.fullname">No numeric allowed</p>
         </template>
           </div>
         </div>
@@ -95,15 +94,15 @@
           class="form-control"
           placeholder="เลขที่ เช่น 5, 34"
           name="no"
-          maxlength="2"
           min="1"
           max="99"
           required
         />
         <template v-if="$v.no.$error">
           <p class="help text-danger" v-if="!$v.no.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.no.no">Please Insert number correctly (2 digits)</p>
-          <p class="help text-danger" v-if="!$v.no.no2">Limit number at 50 only</p>
+          <p class="help text-danger" v-if="!$v.no.numeric || !$v.no.maxLength || !$v.no.no3">Please Insert number correctly (2 digits)</p>
+          <p class="help text-danger" v-if="!$v.no.no2">Limit number at 60 only</p>
+          
         </template>
         <label for="dob">วัน/เดือน/ปี เกิด</label>
         <input
@@ -128,20 +127,15 @@
         />
         <template v-if="$v.address1.$error">
           <p class="help text-danger" v-if="!$v.address1.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.address1.maxLength">This field can contain only 255 characters</p>
-          <p class="help text-danger" v-if="!$v.address1.minLength">This field must contain at least 20 characters</p>
         </template>
         <input
           type="text"
-          v-model="$v.address2.$model" :class="{'is-danger text-danger': $v.address2.$error}"
+          v-model="address2"
           class="form-control"
           name="address2"
           placeholder="ที่อยู่ 2 (ไม่บังคับ)"
           style="margin-top: 10px"
         />
-        <template v-if="$v.address2.$error">
-          <p class="help text-danger" v-if="!$v.address2.maxLength">This field can contain only 255 characters</p>
-        </template>
         <br />
         <div v-for="image in images" :key="image.id">
           <p class="text-center">
@@ -214,13 +208,16 @@ import axios from "axios";
 
 
 function user(value){
-  return !!(value.match(/[1-6]{1}[0-9]{7}/))
+  return !!(value.match(/[1-9]{1}[0-9]{7}/))
 }
 function classes(value){
-  return !!(value.match(/[1-6]{1}[/]{1}[1-6]{1}/))
+  return !!(value.match(/[1-6]{1}[/]{1}[1-8]{1}/))
 }
 function no2(value){
-  return !(parseInt(value) > 50)
+  return !(parseInt(value) > 60)
+}
+function no3(value){
+  return !(value[0] == "0")
 }
 function pass(value){
   if(!(value.match(/[0-9]/) && value.match(/[a-z]/) && value.match(/[A-Z]/) )){
@@ -230,6 +227,12 @@ function pass(value){
 }
 function images(){
    return (!(this.images.length == 0) )
+}
+function fullname (value){
+  if(value.match(/[0-9]/)){
+            return false
+        }
+  return true
 }
 
 
@@ -259,16 +262,17 @@ export default {
     user:{
       required,
       user:user,
-      maxLength: maxLength(8),
-      minLength: minLength(8)
+      maxLength: maxLength(10),
     },
     fname:{
       required,
-      maxLength: maxLength(30)
+      maxLength: maxLength(30),
+      fullname: fullname
     },
     lname:{
       required,
-      maxLength: maxLength(30)
+      maxLength: maxLength(30),
+      fullname: fullname
     },
     classes:{
       required,
@@ -277,7 +281,10 @@ export default {
     no:{
       required,
       numeric: numeric,
-      no2: no2
+      no2: no2,
+      no3: no3,
+      maxLength: maxLength(2),
+      minLength: minLength(1),
     },
     dob:{
       required,
@@ -286,11 +293,6 @@ export default {
     },
     address1:{
       required,
-      minLength: minLength(20),
-      maxLength: maxLength(255)
-    },
-    address2:{
-      maxLength: maxLength(255)
     },
     images:{
       images: images

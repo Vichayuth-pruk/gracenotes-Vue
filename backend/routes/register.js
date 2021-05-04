@@ -6,15 +6,7 @@ const joi = require('joi')
 
 router = express.Router();
 
-const no_validate = (value, helpers) => {
-    if(!(value.match(/[0-9]{2}/) && !(value.match(/^[a-zA-Z]+$/)))){
-        throw new joi.ValidationError("Please insert the number correctly (2 digits)")
-    }
-    else if(parseInt(value) > 50){
-        throw new joi.ValidationError("Limit number is 50 only")
-    }
-    
-}
+
 
 const pass_validate = (value, helpers) => {
     if(!(value.match(/[0-9]/) && value.match(/[a-z]/) && value.match(/[A-Z]/) )){
@@ -69,14 +61,14 @@ const lname = (value, helpers) => {
 const signupSchema = joi.object({
     
     
-    user: joi.string().required().max(8).min(8).external(user_validate),
+    user: joi.string().required().max(10).external(user_validate).pattern(/[0-9]/),
     fname: joi.string().required().max(30).custom(fname),
     lname: joi.string().required().max(30).custom(lname),
-    classes: joi.string().required().pattern(/[1-6]{1}[/]{1}[1-6]{1}/),
+    classes: joi.string().required().max(5).pattern(/[1-6]{1}[/]{1}[1-6]{1}/),
     no: joi.number().required().min(1).max(60).integer().custom(number),
     dob: joi.date().iso().max(Date.now()).required(),
-    address: joi.string().required().min(20).max(510),
-    pass: joi.string().required().min(5).max(15).custom(pass_validate),
+    address: joi.string().required(),
+    pass: joi.string().required().min(5).max(50).custom(pass_validate),
     repass: joi.string().required().valid(joi.ref('pass')),
     
     

@@ -78,7 +78,7 @@ router.get("/social/search/:id", async function(req, res, next){
 })
 
 const upsocialSchema = joi.object({
-    detail: joi.string().required().min(10),
+    detail: joi.string().required(),
     sid: joi.any().required()
 })
 
@@ -125,7 +125,7 @@ router.delete("/social/:id", async function(req, res, next){
 
 const addsocialSchema = joi.object({
     img: joi.string().required(),
-    detail: joi.string().required().min(10),
+    detail: joi.string().required(),
     uid: joi.any().required()
 })
 

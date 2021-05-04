@@ -26,30 +26,29 @@
         <label for="user">รหัสนักเรียน</label>
         <input
           type="text"
-          v-model="$v.user.$model" :class="{'is-danger': $v.user.$error}"
+          v-model="$v.user.$model" :class="{'is-danger text-danger': $v.user.$error}"
           class="form-control"
           placeholder="รหัสนักเรียน"
           name="user"
-          maxlength="10"
           required
         />
         <template v-if="$v.user.$error">
           <p class="help text-danger" v-if="!$v.user.required">This field is required</p>
           <p class="help text-danger" v-if="!$v.user.maxLength">This field can contain only 10 characters</p>
+          <p class="help text-danger" v-if="!$v.user.numeric">This field can contain number only</p>
         </template>
         <label for="password">รหัสผ่าน</label>
         <input
           type="password"
-          v-model="$v.pass.$model" :class="{'is-danger': $v.pass.$error}"
+          v-model="$v.pass.$model" :class="{'is-danger text-danger': $v.pass.$error}"
           class="form-control"
           placeholder="รหัสผ่าน"
           name="password"
-          maxlength="15"
           required
         />
         <template v-if="$v.pass.$error">
           <p class="help text-danger" v-if="!$v.pass.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.pass.maxLength">This field can contain only 10 characters</p>
+          <p class="help text-danger" v-if="!$v.pass.maxLength">This field can contain only 30 characters</p>
         </template>
         <br />
         <div class="text-center">
@@ -66,7 +65,7 @@
 </template>
 
 <script>
-import {required, maxLength} from 'vuelidate/lib/validators'
+import {required, maxLength, numeric} from 'vuelidate/lib/validators'
 import axios from "axios";
 export default {
   data() {
@@ -85,11 +84,12 @@ export default {
   validations:{
     user:{
       required,
-      maxLength: maxLength(10)
+      numeric: numeric,
+      maxLength: maxLength(10),
     },
     pass:{
       required,
-      maxLength: maxLength(10)
+      maxLength: maxLength(30)
     }
 
   },

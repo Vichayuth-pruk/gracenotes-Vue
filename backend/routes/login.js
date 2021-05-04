@@ -5,9 +5,9 @@ const joi = require('joi')
 
 router = express.Router();
 
-const loginSchema = joi.object({
-    user: joi.string().required(),
-    pass: joi.string().required()
+const loginSchema = joi.object().keys({
+    user: joi.string().required().max(10),
+    pass: joi.string().required().max(30)
 })
 
 

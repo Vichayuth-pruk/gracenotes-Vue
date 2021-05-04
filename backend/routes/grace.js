@@ -144,8 +144,8 @@ router.delete("/grace/:id", async function (req, res, next) {
 const graceSchema = joi.object({
     time: joi.string().required().pattern(/[0-2]{1}[0-9]{1}:[0-6]{1}[0-9]{1}/),
     date: joi.date().iso().max(Date.now()).required(),
-    detail: joi.string().required().min(10),
-    agency: joi.string().required().min(5),
+    detail: joi.string().required(),
+    agency: joi.string().required().max(50),
     sid: joi.any().required(),
 })
 

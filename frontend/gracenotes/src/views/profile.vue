@@ -137,6 +137,7 @@
              <template v-if="$v.fname.$error">
           <p class="help text-danger" v-if="!$v.fname.required">This field is required</p>
           <p class="help text-danger" v-if="!$v.fname.maxLength">This field can contain only 30 characters</p>
+          <p class="help text-danger" v-if="!$v.fname.fullname">No numeric allowed</p>
         </template>
           </div>
           <div class="col">
@@ -151,9 +152,10 @@
               required
             />
             
-            <template v-if="$v.lname.$error">
+             <template v-if="$v.lname.$error">
           <p class="help text-danger" v-if="!$v.lname.required">This field is required</p>
           <p class="help text-danger" v-if="!$v.lname.maxLength">This field can contain only 30 characters</p>
+          <p class="help text-danger" v-if="!$v.lname.fullname">No numeric allowed</p>
         </template>
           </div>
         </div>
@@ -179,15 +181,15 @@
           class="form-control"
           placeholder="เลขที่ เช่น 5, 34"
           name="no"
-          maxlength="2"
           min="1"
           max="99"
           required
         />
         <template v-if="$v.no.$error">
           <p class="help text-danger" v-if="!$v.no.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.no.numeric">Please Insert number correctly (2 digits)</p>
+          <p class="help text-danger" v-if="!$v.no.numeric || !$v.no.maxLength || !$v.no.no3">Please Insert number correctly (2 digits)</p>
           <p class="help text-danger" v-if="!$v.no.no2">Limit number at 60 only</p>
+          
         </template>
         <label for="dob">วัน/เดือน/ปี เกิด</label>
         <input
@@ -199,7 +201,7 @@
           placeholder="วัน/เดือน/ปี เกิด"
           required
         />
-        <template v-if="$v.dob.$error">
+       <template v-if="$v.dob.$error">
           <p class="help text-danger" v-if="!$v.dob.required">This field is required</p>
           <p class="help text-danger" v-if="!$v.dob.maxValue">Please Insert Date correctly</p>
         </template>
@@ -215,8 +217,6 @@
         />
         <template v-if="$v.address.$error">
           <p class="help text-danger" v-if="!$v.address.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.address.maxLength">This field can contain only 510 characters</p>
-          <p class="help text-danger" v-if="!$v.address.minLength">This field must contain at least 20 characters</p>
         </template>
         <label for="pass">รหัสผ่านใหม่</label>
         <input
@@ -225,7 +225,6 @@
           class="form-control"
           name="pass"
           placeholder="รหัสผ่านใหม่"
-          maxlength="15"
           required
         />
         <template v-if="$v.pass.$error">
@@ -240,7 +239,6 @@
           class="form-control"
           name="repass"
           placeholder="ยืนยันรหัสผ่านใหม่"
-          maxlength="15"
           required
         />
         <template v-if="$v.repass.$error">
@@ -268,19 +266,24 @@ import axios from "axios";
 
 
 function classes(value){
-  return !!(value.match(/[1-6]{1}[/]{1}[1-6]{1}/))
+  return !!(value.match(/[1-6]{1}[/]{1}[1-8]{1}/))
 }
-
-
-
 function no2(value){
   return !(parseInt(value) > 60)
 }
-
+function no3(value){
+  return !(value[0] == "0")
+}
 function pass(value){
   if(!(value.match(/[0-9]/) && value.match(/[a-z]/) && value.match(/[A-Z]/) )){
     return false
   }
+  return true
+}
+function fullname (value){
+  if(value.match(/[0-9]/)){
+            return false
+        }
   return true
 }
 
@@ -303,11 +306,13 @@ export default {
   validations:{
     fname:{
       required,
-      maxLength: maxLength(30)
+      maxLength: maxLength(30),
+      fullname: fullname
     },
     lname:{
       required,
-      maxLength: maxLength(30)
+      maxLength: maxLength(30),
+      fullname: fullname
     },
     class:{
       required,
@@ -317,6 +322,9 @@ export default {
       required,
       numeric: numeric,
       no2: no2,
+      no3: no3,
+      maxLength: maxLength(2),
+      minLength: minLength(1),
     },
     dob:{
       required,
@@ -325,14 +333,11 @@ export default {
     },
     address:{
       required,
-      minLength: minLength(20),
-      maxLength: maxLength(510)
     },
 
     pass:{
       required,
-      minLength: minLength(5),
-      maxLength: maxLength(15),
+      maxLength: maxLength(50),
       pass: pass
     },
     repass:{

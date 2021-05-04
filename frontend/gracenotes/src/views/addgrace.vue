@@ -192,7 +192,7 @@
 </template>
 
 <script>
-import {required, minLength} from 'vuelidate/lib/validators'
+import {required, maxLength} from 'vuelidate/lib/validators'
 import axios from "axios";
 
 function images(){
@@ -227,11 +227,10 @@ export default {
     },
     detail:{
       required,
-      minLength: minLength(10)
     },
     agency:{
       required,
-      minLength: minLength(5)
+      maxLength: maxLength(50)
       
     },
     images:{

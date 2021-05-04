@@ -7,8 +7,8 @@ router = express.Router();
 const reportSchema = joi.object({
     
     
-    head: joi.string().required().min(5).max(20),
-    body: joi.string().required().min(10),
+    head: joi.string().required().max(100),
+    body: joi.string().required(),
     sid: joi.any().required()
     
     

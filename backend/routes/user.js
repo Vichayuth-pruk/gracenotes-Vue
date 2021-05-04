@@ -121,15 +121,7 @@ router.get("/user/search/:id", async function(req, res, next){
     }
 })
 
-const no_validate = (value, helpers) => {
-    if(!(value.match(/[0-9]{2}/) && !(value.match(/^[a-zA-Z]+$/)))){
-        throw new joi.ValidationError("Please insert the number correctly (2 digits)")
-    }
-    else if(parseInt(value) > 50){
-        throw new joi.ValidationError("Limit number is 50 only")
-    }
-    
-}
+
 
 const pass_validate = (value, helpers) => {
     if(!(value.match(/[0-9]/) && value.match(/[a-z]/) && value.match(/[A-Z]/) )){
@@ -176,15 +168,15 @@ const pass_validate = (value, helpers) => {
 const upuserSchema = joi.object({
     
     
-    member_user: joi.string().required().max(8).min(8),
+    member_user: joi.string().required().max(10).pattern(/[0-9]/),
     member_fname: joi.string().required().max(30).custom(fname),
     member_lname: joi.string().required().max(30).custom(lname),
-    member_class: joi.string().required().pattern(/[1-6]{1}[/]{1}[1-6]{1}/),
+    member_class: joi.string().required().max(5).pattern(/[1-6]{1}[/]{1}[1-6]{1}/),
     member_no: joi.number().required().min(1).max(60).integer().custom(number),
     member_dob: joi.date().iso().max(Date.now()).required(),
-    member_address: joi.string().required().min(20).max(510),
+    member_address: joi.string().required(),
     member_level: joi.string().required().custom(level),
-    member_password: joi.string().required().min(5).max(15).custom(pass_validate),
+    member_password: joi.string().required().min(5).max(50).custom(pass_validate),
     member_id: joi.any().required(),
     member_img: joi.any().allow(""),
     member_timestamp: joi.any().allow(""),
