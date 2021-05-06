@@ -145,7 +145,6 @@
         />
         <template v-if="$v.detail.$error">
           <p class="help text-danger" v-if="!$v.detail.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.detail.minLength">This field must contain at least 5 character </p>
         </template>
         <p class="text-center my-3">
           <input
@@ -183,7 +182,7 @@
 </template>
 
 <script>
-import {required, minLength} from 'vuelidate/lib/validators'
+import {required} from 'vuelidate/lib/validators'
 import axios from "axios";
 export default {
   data() {
@@ -200,7 +199,6 @@ export default {
   validations:{
     detail:{
       required,
-      minLength: minLength(5)
     },
 
   },

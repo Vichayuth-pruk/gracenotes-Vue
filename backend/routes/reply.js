@@ -37,7 +37,7 @@ router.delete("/reply/:id", async function (req, res, next) {
 const reportSchema = joi.object({
     
     
-    detail: joi.string().required().min(5),
+    detail: joi.string().required(),
     sid: joi.any().required(),
     uid: joi.any().required()
     

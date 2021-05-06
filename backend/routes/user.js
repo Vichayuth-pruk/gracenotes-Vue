@@ -171,7 +171,7 @@ const upuserSchema = joi.object({
     member_user: joi.string().required().max(10).pattern(/[0-9]/),
     member_fname: joi.string().required().max(30).custom(fname),
     member_lname: joi.string().required().max(30).custom(lname),
-    member_class: joi.string().required().max(5).pattern(/[1-6]{1}[/]{1}[1-6]{1}/),
+    member_class: joi.string().required().max(5).pattern(/[1-6]{1}[/]{1}[1-8]{1}/),
     member_no: joi.number().required().min(1).max(60).integer().custom(number),
     member_dob: joi.date().iso().max(Date.now()).required(),
     member_address: joi.string().required(),

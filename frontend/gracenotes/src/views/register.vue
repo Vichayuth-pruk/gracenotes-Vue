@@ -36,7 +36,7 @@
         />
         <template v-if="$v.user.$error">
           <p class="help text-danger" v-if="!$v.user.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.user.user">Please insert user ID correctly</p>
+          <p class="help text-danger" v-if="!$v.user.user || !$v.user.numeric">Please insert user ID correctly (8-10 digits)</p>
           <p class="help text-danger" v-if="!$v.user.maxLength">This field can contain only 10 digits</p>
         </template>
         <div class="row g-2">
@@ -85,7 +85,7 @@
         />
         <template v-if="$v.classes.$error">
           <p class="help text-danger" v-if="!$v.classes.required">This field is required</p>
-          <p class="help text-danger" v-if="!$v.classes.classes">Please Insert class correctly</p>
+          <p class="help text-danger" v-if="!$v.classes.classes">Please Insert class correctly (class 1-8 only)</p>
         </template>
         <label for="no">เลขที่</label>
         <input
@@ -261,6 +261,7 @@ export default {
   validations:{
     user:{
       required,
+      numeric: numeric,
       user:user,
       maxLength: maxLength(10),
     },

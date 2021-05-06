@@ -64,7 +64,7 @@ const signupSchema = joi.object({
     user: joi.string().required().max(10).external(user_validate).pattern(/[0-9]/),
     fname: joi.string().required().max(30).custom(fname),
     lname: joi.string().required().max(30).custom(lname),
-    classes: joi.string().required().max(5).pattern(/[1-6]{1}[/]{1}[1-6]{1}/),
+    classes: joi.string().required().max(5).pattern(/[1-6]{1}[/]{1}[1-8]{1}/),
     no: joi.number().required().min(1).max(60).integer().custom(number),
     dob: joi.date().iso().max(Date.now()).required(),
     address: joi.string().required(),
