@@ -10,8 +10,6 @@ const loginSchema = joi.object().keys({
     pass: joi.string().required().max(30)
 })
 
-
-
 // coding here !!
 router.post("/login", async function(req, res, next){
     
