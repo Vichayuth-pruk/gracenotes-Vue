@@ -180,7 +180,9 @@
           <button class="btn btn-outline-danger mx-1" @click="delGrace()">
             ลบ
           </button>
+          <span v-if="graces.grace_check == 'ผ่าน'">
           <a :href="'/addsocial/' + graces.grace_id"> <button class="btn btn-success mx-1">เผยแพร่</button> </a>
+          </span>
         </p>
       </div>
       <br /><br />
